@@ -1,7 +1,3 @@
 hey
-<<<<<<< HEAD
-dAas
 
-sasd
-=======
->>>>>>> parent of 8b8459b... Update example.txt
+David
