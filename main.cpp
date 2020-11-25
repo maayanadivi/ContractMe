@@ -1,5 +1,3 @@
-// temp for our project
-
 #pragma once
 #include <iostream>
 #include <fstream>
@@ -7,41 +5,49 @@
 #include <string>
 #include <cstring>
 #include <algorithm>
-#include "json.hpp"
 
 using namespace std;
 #define _CRT_SECURE_NO_WARNINGS
 #define N 30  // max char for username
 
+const int HR_TYPE = 1;
+const int EMPLOYEER_TYPE = 2;
+const int CONSTARCTOR_TYPE = 3;
 
-
-int CCount=0; // Contractor user count.
-int ECount = 0; // Employer user count.
+int ContractorCount = 0; // Contractor user count.
+int EmployerCount = 0;  // Employer user count.
 
 typedef struct {
 	char *name;  // name +last name 
 	char *username;  // username
 	char *password;
-	int UserType;  //  1 = HR  ,  2 = Employee  ,  3 = Contractor
+	int UserType=0;  //  1 = HR  ,  2 = Employeer  ,  3 = Contractor
 } User;
 
 typedef struct {
-	User contractor;
+	User details;
 	int salary;
-} Contractor;
-
-
+	//WorkDay *workDay;
+	int WorkDaySize;
+}Contractor;
+ 
+typedef struct {
+	int day;
+	int month;
+	int startTime;
+	int endTime;
+}WorkDay;
 
 void mainmenu();
 void login();
-void sign();
+void signUp();
 void lowercase(char*);
-void add();
+void writeUserToFile(User);
 void tech();
-void employe();
-void HR();
-void contractor();
-void checkpass();
+void hrMenu();
+void employeerMenu();
+void contractorMenu();
+void ChooseMenu(int type);
 
 
 int main()
@@ -53,42 +59,42 @@ int main()
 	cout << "CCCCCC   ooo   n   n   tttt  r      aaaaaa  cccc   tttt  M                M  eeee " << endl;
 
 	cout << "\n\n\n+++++++++++++++++++++++++++++++++++++++++++\n+++  HELLO! :), welcome to ContractMe!  +++  (for technical support press '0' at anytime)\n+++++++++++++++++++++++++++++++++++++++++++\n" << endl;
-	
 
 	mainmenu();
-	
-// Good Bye message with hand gesture :DD
-return 0;
+
+	// Good Bye message with hand gesture :DD
+	return 0;
 }
 
 void mainmenu()
 {
-	int choice = 99;
-	cout << "\n\tLOGIN & Sign up page\n\tEnter your choice:\n\n1. Login \n2. Sign up \n9. Exit\n" << endl;
-	cin >> choice;
-	switch (choice)
-	{
-	case 0: // technical support
-		tech();
-		break;
-	case 1: // login
-		login();
-		break;
-	case 2: // sign up
-		sign();
-		break;
-	case 9: // exit
-		break;
-	default:
-		cout << "\nError, please try again:\n" << endl;
-		mainmenu(); // entering to main again, (loop)
-	}
+	int choice;
+	
+	do {
+		cout << "\n\tLOGIN & Sign up page\n\tEnter your choice:\n\n1. Login \n2. Sign up \n3. Exit\n" << endl;
+		cin >> choice;
+		switch (choice)
+		{
+		case 0: // technical support
+			tech();
+			break;
+		case 1: // login
+			login();
+			break;
+		case 2: // sign up
+			signUp();
+			break;
+		case 3: // exit
+			break;
+		default:
+			cout << "\nError, please try again:\n" << endl;
+		} 
+	} while (choice != 3);
 }
 void login()
 {
-	char user;
-	char pass;
-	char check;
+	char user[N];
+	int pass;
 	cout << "please enter your username:\n" << endl;
 	cin >> user;
 	cout << "please enter your password:\n" << endl;
@@ -100,68 +106,51 @@ void login()
 		cerr << "error opening file" << endl;
 		exit(1);
 	}
-	int found = 0;
-	while (!inFile.eof()) {
-		inFile >> check;
-		if (check == user)
-			found = 1;
+	char* checkuser = new char[strlen(user) + 1];
+	int checkpass;
+	int checktype;
+	while (!inFile.eof()) { // needs to compare only with the username, (for now it compares to everything which is wrong.)
+		{
+			inFile >> checkuser;  // name is in temp - not using.
+			inFile >> checkuser;
+			if (strcmp(checkuser, user) == 0)
+			{
+				cout << "USER EXISTS\n";
+				inFile >> checkpass;
+				if (checkpass == pass)
+				{
+					cout << "Welcome\n";
+					inFile >> checktype;
+					inFile.close();
+					ChooseMenu(checktype);
+					return;
+				}
+				else cout << "Wrong pass.\n";
+				return;
+			}
+		}
 	}
-	if (found == 0)
-	{
-		cout << ("user does not exsist in the database, try again");
-		inFile.close();
-		login(); // re entering login 
-	}
-	if (found == 1)// user found
-	{
-		//checkpass(user);
-	}
-
-	// entering database to check if username exists.
-	// if no, error
-	// if yes, checking if password matchs, 
-	// if no error,
-	// if yes -> returning from function the Type of the user
-	//
-
-
-	//int type = func();
-
-	//cout << "\n\tLOGIN & Sign up page\n\tEnter your choice:\n\n1. Login \n2. Sign up \n9. Exit\n" << endl;
-	//cin >> choice;
-	//switch (choice)
-	//{
-	//case 0: // tech
-	//	tech();
-	//	break;
-	//case 1: // type 1 = HR
-	//	HR();
-	//	break;
-	//case 2: // type 2 = employe
-	//	employe();
-	//	break;
-	//case 3: // type 3 = contractor
-	//	contractor();
-	//	break;
-	//case 9: // exit
-	//	break;
-	//default:
-	//	cout << "\nError, please try again:\n" << endl;
-	//	login(); // entering to login again, (loop)
-	//}
+	cout << "user does not exsist in the database, try again";
+	inFile.close();
+	return;
 }
 
-void sign()
+void signUp() // only Employer
 {
-	
-	char name[N],  username[N], password[N];
+	User u1;
+	char name[N], username[N], password[N];
 	cout << ("\nHello, enter your name, user and password:\n");
 
 	cin >> name >> username >> password;
 	lowercase(username);
-	cout << username;
-
-	add(name, username, password);
+	u1.name = name;
+	u1.username = username;
+	u1.password = password;
+	u1.UserType = EMPLOYEER_TYPE;  // employer 
+	//u1.salary = 0;
+	writeUserToFile(u1);
+	EmployerCount++; // Beautiful Comment
+	mainmenu();
 	getchar();
 	getchar();
 }
@@ -174,9 +163,32 @@ void lowercase(char* lower)
 	}
 }
 
-void add(char* name, char *username, char *password)
+void writeUserToFile(User newUser)
 {
+	ofstream inFile;
+	inFile.open("database.txt",ios::app);
+	if (inFile.fail()) {
+		cout << "error opening file" << endl;
+		exit(1);
+	}
+	inFile << "\n";
+	inFile << newUser.name << " ";
+	inFile << newUser.username << " ";
+	inFile << newUser.password << " ";
+	inFile << newUser.UserType << " ";
+	//if (newUser.UserType == 3) // if its contractor
+	//	inFile << newUser.salary;
+	inFile.close();
+}
 
+void ChooseMenu(int type)
+{
+	if (type == 1)
+		hrMenu();
+	else if (type == 2)
+		employeerMenu();
+	else
+		contractorMenu();
 }
 
 void tech()
@@ -184,22 +196,17 @@ void tech()
 
 }
 
-void employe()
+void hrMenu()
+{
+
+}
+void employeerMenu()
 {
 
 }
 
-void HR()
+void contractorMenu()
 {
 
 }
 
-void contractor()
-{
-
-}
-
-bool checkpass(string check, string check2)
-{
-	return 0;
-}
