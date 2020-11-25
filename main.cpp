@@ -1,8 +1,16 @@
 // temp for our project
 
 #pragma once
+#include <iostream>
+#include <fstream>
+#include <cstdlib>
+#include <string>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+#define _CRT_SECURE_NO_WARNINGS
+#define N 30  // max char for username
 
-#include "helpers.cpp"
 
 
 
@@ -10,16 +18,23 @@ int CCount=0; // Contractor user count.
 int ECount = 0; // Employer user count.
 
 typedef struct {
-	char name[N];  // name +last name 
-	char username[N];  // username
-	char password[N];
+	char *name;  // name +last name 
+	char *username;  // username
+	char *password;
 	int UserType;  //  1 = HR  ,  2 = Employee  ,  3 = Contractor
 } User;
+
+typedef struct {
+	User contractor;
+	int salary;
+} Contractor;
+
 
 
 void mainmenu();
 void login();
 void sign();
+void lowercase(char*);
 void add();
 void tech();
 void employe();
@@ -144,18 +159,23 @@ void sign()
 	cin >> name >> username >> password;
 	lowercase(username);
 	cout << username;
-	//User u1;
-	//u1.name = name;
-	//u1.username = username;
-	//u1.password = password;
-	//add(u1);
+
+	add(name, username, password);
 	getchar();
 	getchar();
 }
 
-
-void add(User)
+void lowercase(char* lower)
 {
+	for (unsigned int i = 0; i < strlen(lower); i++) // to lowercase the chars
+	{
+		lower[i] = tolower(lower[i]);
+	}
+}
+
+void add(char* name, char *username, char *password)
+{
+
 }
 
 void tech()
