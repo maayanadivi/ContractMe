@@ -1,27 +1,31 @@
 // temp for our project
 
-
 #pragma once
-#include <iostream>
-using namespace std;
-#define _CRT_SECURE_NO_WARNINGS
-#define N 30  // max char for username
+
+#include "helpers.cpp"
+
+
+
+int CCount=0; // Contractor user count.
+int ECount = 0; // Employer user count.
 
 typedef struct {
 	char name[N];  // name +last name 
-	//char lname[N];
 	char username[N];  // username
-	int password;
-	int type;  //  1 = HR  ,  2 = Employee  ,  3 = Contractor
+	char password[N];
+	int UserType;  //  1 = HR  ,  2 = Employee  ,  3 = Contractor
 } User;
+
 
 void mainmenu();
 void login();
 void sign();
+void add();
 void tech();
 void employe();
 void HR();
 void contractor();
+void checkpass();
 
 
 int main()
@@ -66,9 +70,37 @@ void mainmenu()
 }
 void login()
 {
-	char user[N];
-	cout << "please enter your user name:\n" << endl;
+	char user;
+	char pass;
+	char check;
+	cout << "please enter your username:\n" << endl;
 	cin >> user;
+	cout << "please enter your password:\n" << endl;
+	cin >> pass;
+
+	ifstream inFile;
+	inFile.open("database.txt");
+	if (inFile.fail()) {
+		cerr << "error opening file" << endl;
+		exit(1);
+	}
+	int found = 0;
+	while (!inFile.eof()) {
+		inFile >> check;
+		if (check == user)
+			found = 1;
+	}
+	if (found == 0)
+	{
+		cout << ("user does not exsist in the database, try again");
+		inFile.close();
+		login(); // re entering login 
+	}
+	if (found == 1)// user found
+	{
+		//checkpass(user);
+	}
+
 	// entering database to check if username exists.
 	// if no, error
 	// if yes, checking if password matchs, 
@@ -105,7 +137,25 @@ void login()
 
 void sign()
 {
+	
+	char name[N],  username[N], password[N];
+	cout << ("\nHello, enter your name, user and password:\n");
 
+	cin >> name >> username >> password;
+	lowercase(username);
+	cout << username;
+	//User u1;
+	//u1.name = name;
+	//u1.username = username;
+	//u1.password = password;
+	//add(u1);
+	getchar();
+	getchar();
+}
+
+
+void add(User)
+{
 }
 
 void tech()
@@ -126,4 +176,9 @@ void HR()
 void contractor()
 {
 
+}
+
+bool checkpass(string check, string check2)
+{
+	return 0;
 }
