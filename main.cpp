@@ -7,6 +7,7 @@
 #include <string>
 #include <cstring>
 #include <algorithm>
+#include "json.hpp"
 using namespace std;
 #define _CRT_SECURE_NO_WARNINGS
 #define N 30  // max char for username
