@@ -116,7 +116,6 @@ void login()
 		{
 			inFile >> checkuser;  // name is in temp - not using.
 			inFile >> checkuser;
-			cout << checkuser << endl;
 			if (strcmp(checkuser, user) == 0)
 			{
 				cout << "USER EXISTS\n";
@@ -139,7 +138,7 @@ void login()
 	return;
 }
 
-void signUp() // only Employer
+void signUp() // only Employer can signup
 {
 	User u1;
 	char name[N], username[N], password[N];
@@ -200,15 +199,65 @@ void tech()
 
 void hrMenu()
 {
-
+	int choice = 0;
+	while (choice != 4) {
+		cout << "Hello, welcome to the HR Menu, what do you want to do next? " << endl
+			<< "1.Statistic Analysis" << endl
+			<< "2.Monitor Hiring" << endl 
+			<< "3.Add New Worker" << endl
+			<< "4.Workers Feed" << endl
+			<< "5.Sign out" << endl;
+		cin >> choice;
+		switch (choice) {
+			case 1: 
+				//statisticAnalysis();
+				break;
+			case 2:
+				//monitorHiring();
+				break;
+			case 3:
+				//addNewWorker();
+				break;
+			case 4:
+				//workersFeed();
+				break;
+			case 5:
+				cout << "Signed out of the system." << endl;
+				break;
+			default: 
+				cout << "Please enter choce between 1-5 only, 5 to sign out." << endl;
+		}
+	}
 }
+
 void employeerMenu()
 {
-
+	int choice = 0;
+	while (choice != 3) {
+		cout << "Hello, welcome to the Employeer Menu, what do you want to do next? " << endl
+			<< "1.Hiring History" << endl
+			<< "2.Search Contractor" << endl 
+			<< "3.Sign out" << endl;
+		cin >> choice;
+		switch (choice) {
+			case 1: 
+				//hiringHistory();
+				break;
+			case 2:
+				//searchContractor();
+				break;
+			case 3:
+				cout << "Signed out of the system." << endl;
+				break;
+			default: 
+				cout << "Please enter choce between 1-3 only, 3 to sign out." << endl;
+		}
+	}
 }
 
 void contractorMenu()
 {
-
+	//Show monthly work hors and salary.
+	//Only one choice - report work hours or vacation.
 }
 
