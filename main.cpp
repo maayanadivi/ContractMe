@@ -91,6 +91,7 @@ void mainmenu()
 		} 
 	} while (choice != 3);
 }
+
 void login()
 {
 	char user[N];
@@ -100,6 +101,8 @@ void login()
 	cout << "please enter your password:\n" << endl;
 	cin >> pass;
 
+	lowercase(user); //Change to lowercase before searching.
+	
 	ifstream inFile;
 	inFile.open("database.txt");
 	if (inFile.fail()) {
@@ -113,6 +116,7 @@ void login()
 		{
 			inFile >> checkuser;  // name is in temp - not using.
 			inFile >> checkuser;
+			cout << checkuser << endl;
 			if (strcmp(checkuser, user) == 0)
 			{
 				cout << "USER EXISTS\n";
@@ -139,20 +143,18 @@ void signUp() // only Employer
 {
 	User u1;
 	char name[N], username[N], password[N];
-	cout << ("\nHello, enter your name, user and password:\n");
 
+	cout << ("\nHello, enter your name, user and password:\n");
 	cin >> name >> username >> password;
-	lowercase(username);
+	
+	lowercase(username); //Account usernames will be stored in lowercase on the DataBase.
 	u1.name = name;
 	u1.username = username;
 	u1.password = password;
 	u1.UserType = EMPLOYEER_TYPE;  // employer 
-	//u1.salary = 0;
 	writeUserToFile(u1);
-	EmployerCount++; // Beautiful Comment
-	mainmenu();
-	getchar();
-	getchar();
+
+	EmployerCount++; // Counting the number of employers in the system - for "Statistic Analysis"
 }
 
 void lowercase(char* lower)
