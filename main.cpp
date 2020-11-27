@@ -16,6 +16,7 @@ const int CONSTARCTOR_TYPE = 3;
 
 int ContractorCount = 0; // Contractor user count.
 int EmployerCount = 0;  // Employer user count.
+typedef enum {Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec} Month;
 
 typedef struct {
 	char *name;  // name +last name 
@@ -28,26 +29,29 @@ typedef struct {
 	User details;
 	int salary;
 	//WorkDay *workDay;
-	int WorkDaySize;
 }Contractor;
  
 typedef struct {
 	int day;
-	int month;
+	Month month;
 	int startTime;
 	int endTime;
 }WorkDay;
 
+
+
 void mainmenu();
 void login();
 void signUp();
-void lowercase(char*);
 void writeUserToFile(User);
 void tech();
 void hrMenu();
 void employeerMenu();
 void contractorMenu();
 void ChooseMenu(int type);
+bool checkUserExists(ifstream&, char*);
+void lowercase(char*);
+
 
 
 int main()
@@ -94,14 +98,14 @@ void mainmenu()
 
 void login()
 {
-	char user[N];
+	char userInput[N];
 	int pass;
 	cout << "please enter your username:\n" << endl;
-	cin >> user;
+	cin >> userInput;
 	cout << "please enter your password:\n" << endl;
 	cin >> pass;
 
-	lowercase(user); //Change to lowercase before searching.
+	lowercase(userInput); //Change to lowercase before checking if exists.
 	
 	ifstream inFile;
 	inFile.open("database.txt");
@@ -109,29 +113,21 @@ void login()
 		cerr << "error opening file" << endl;
 		exit(1);
 	}
-	char* checkuser = new char[strlen(user) + 1];
+	//char* checkuser = new char[strlen(user) + 1];
 	int checkpass;
 	int checktype;
-	while (!inFile.eof()) { // needs to compare only with the username, (for now it compares to everything which is wrong.)
+	if( checkUserExists(inFile, userInput) ) {
+		inFile >> checkpass;
+		if (checkpass == pass) 
 		{
-			inFile >> checkuser;  // name is in temp - not using.
-			inFile >> checkuser;
-			if (strcmp(checkuser, user) == 0)
-			{
-				cout << "USER EXISTS\n";
-				inFile >> checkpass;
-				if (checkpass == pass)
-				{
-					cout << "Welcome\n";
-					inFile >> checktype;
-					inFile.close();
-					ChooseMenu(checktype);
-					return;
-				}
-				else cout << "Wrong pass.\n";
-				return;
-			}
+			cout << "Welcome\n";
+			inFile >> checktype;
+			inFile.close();
+			ChooseMenu(checktype);
+			return;
 		}
+		else cout << "Wrong pass.\n";
+		return;
 	}
 	cout << "user does not exsist in the database, try again";
 	inFile.close();
@@ -147,6 +143,19 @@ void signUp() // only Employer can signup
 	cin >> name >> username >> password;
 	
 	lowercase(username); //Account usernames will be stored in lowercase on the DataBase.
+	
+	// Username in database must be unique.
+	ifstream inFile;
+	inFile.open("database.txt");
+	if (inFile.fail()) {
+		cerr << "error opening file" << endl;
+		exit(1);
+	}
+	while(checkUserExists(inFile, username)) {
+		cout << "Username taken."
+			 << "Enter another username " << endl;
+		cin >> username;
+	}
 	u1.name = name;
 	u1.username = username;
 	u1.password = password;
@@ -154,14 +163,7 @@ void signUp() // only Employer can signup
 	writeUserToFile(u1);
 
 	EmployerCount++; // Counting the number of employers in the system - for "Statistic Analysis"
-}
-
-void lowercase(char* lower)
-{
-	for (unsigned int i = 0; i < strlen(lower); i++) // to lowercase the chars
-	{
-		lower[i] = tolower(lower[i]);
-	}
+	employeerMenu();
 }
 
 void writeUserToFile(User newUser)
@@ -200,7 +202,7 @@ void tech()
 void hrMenu()
 {
 	int choice = 0;
-	while (choice != 4) {
+	while (choice != 5) {
 		cout << "Hello, welcome to the HR Menu, what do you want to do next? " << endl
 			<< "1.Statistic Analysis" << endl
 			<< "2.Monitor Hiring" << endl 
@@ -261,3 +263,29 @@ void contractorMenu()
 	//Only one choice - report work hours or vacation.
 }
 
+//  
+// HELPERS FUNCTIONS
+// 
+
+void lowercase(char* lower)
+{
+	for (unsigned int i = 0; i < strlen(lower); i++) // to lowercase the chars
+	{
+		lower[i] = tolower(lower[i]);
+	}
+}
+
+bool checkUserExists(ifstream& inFile, char* userInput)
+{
+	char* checkInput = new char[strlen(userInput)+1];
+	string skipLine;
+	while (!inFile.eof()) {
+		inFile >> checkInput; // Ignoring first word.
+		inFile >> checkInput; // Getting the UserName field from the file.
+		if(strcmp(checkInput,userInput) == 0) {
+			return true;
+		}
+		getline(inFile, skipLine); // Skiping line
+	}
+	return false; // If no matching user was found.
+}
