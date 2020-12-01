@@ -1,5 +1,5 @@
-
-david david1 1234 1
-david david1 1234 2 
-david davvid1 1234556 2 
-David Davvvid1 123456 2 
+// name username password type workHours payPerHour LastParameter=NotAvailable([DayOfMonth], add if more than 1 untill '\n')
+Benny bennyy 123 1
+Mayan mayann 123 2
+David davidd 123 3 70 50 7
+Ben bennyz 12345 2 
