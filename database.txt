@@ -1,5 +1,10 @@
-// name username password type workHours payPerHour LastParameter=NotAvailable([DayOfMonth], add if more than 1 untill '\n')
-Benny bennyy 123 1
-Mayan mayann 123 2
-David davidd 123 3 70 50 7
-Ben bennyz 12345 2 
+/* inFile << username << " ";
+	inFile << password << " ";
+	inFile << fullName << " ";
+	inFile << CONTRACTOR_TYPE << " ";
+	inFile << wage << " ";
+	inFile << skills << " ";
+	inFile << place << " ";
+*/
+bennyy 123 Benny 3 7777 cpp ashdod 
+davidd 123 David 1

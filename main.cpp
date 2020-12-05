@@ -1,5 +1,8 @@
 #pragma once
 #include <iostream>
+#include <windows.h> 
+#include <conio.h>
+#include <dos.h>
 #include <fstream>
 #include <cstdlib>
 #include <string>
@@ -40,7 +43,9 @@ typedef struct {
 }WorkDay;
 
 
-
+void textColor(int textcolor);
+void ourLogo();
+void printBye();
 void mainmenu();
 string calendar(char*);
 void login();
@@ -67,19 +72,92 @@ void contractorMenu(char *userInput);
 
 int main()
 {
-	cout << "\n";
-	cout << "CCCCCC                                                       MMM    MMM " << endl;
-	cout << "CC       ooo   n       t                           t        M   M  M   M" << endl;
-	cout << "C       o   o  nnnn   ttt   r rrrr  aaaa    cccc  ttt      M     MM     M    eeee" << endl;
-	cout << "CC      o   o  n   n   t     r      a  a    c      t      M              M   e--- " << endl;
-	cout << "CCCCCC   ooo   n   n   tttt  r      aaaaaa  cccc   tttt  M                M  eeee " << endl;
+	//system("color 1");  // cmd background color
+	//textColor(1);
 
-	cout << "\n\n\n+++++++++++++++++++++++++++++++++++++++++++\n+++  HELLO! :), welcome to ContractMe!  +++  (for technical support press '0' at anytime)\n+++++++++++++++++++++++++++++++++++++++++++\n" << endl;
-	calendar("Maayan");
+	//color tester
+	/*HANDLE  hConsole;
+	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	int k=0;
+	SetConsoleTextAttribute(hConsole, k);
+	for (k = 1; k < 255; k++)
+	{
+		// pick the colorattribute k you want
+		SetConsoleTextAttribute(hConsole, k);
+		cout << k << " I want to be nice today!" << endl;
+	}
+	*/
+	
+	ourLogo(); // function to print our logo
+
+
+	textColor(15);
+	cout << endl << endl
+		 <<"+++++++++++++++++++++++++++++++++++++++++++" << endl
+		 <<"+++  HELLO! :), welcome to ContractMe!  +++  (for technical support press '0' at anytime)" << endl
+		 <<"+++++++++++++++++++++++++++++++++++++++++++" << endl;
+
+	textColor(15); // white text
+	//calendar("Maayan");
 	mainmenu();
 
-	// Good Bye message with hand gesture :DD
+	printBye();
+	getchar();
+	getchar();
 	return 0;
+}
+
+void textColor(int textcolor)  // function to switch text colors
+{
+	/*
+	0 = black
+	1 = dark blue
+	3 = dark cyan
+	9 = blue
+	11 = cyan
+	15 = white
+	31 = white text on blue background
+	240 = black text on white background
+	241 = dark blue text on white background
+	249 = blue text on white background
+	*/
+	HANDLE  hConsole;
+	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hConsole, textcolor);
+}
+
+void ourLogo() // func to print our logo
+{
+	textColor(48);
+	cout << "                                                                                  " << endl;
+	textColor(48); cout << "  ";textColor(1); cout << " CCCCCCC                                                   M     M            "; textColor(48); cout << "  " << endl;
+	textColor(48); cout << "  ";textColor(1); cout << " CCC           n      t                         t         MMM   MMM     eeeee "; textColor(48); cout << "  " << endl;
+	textColor(48); cout << "  ";textColor(1); cout << " CC       ooo  nnnn  ttt   r rrrr aaaaa  ccccc ttt       M   M M   M    e     "; textColor(48); cout << "  " << endl;
+	textColor(48); cout << "  ";textColor(1); cout << " CC      o   o n   n  t     r     a   a  c      t       M     M     M   eeee  "; textColor(48); cout << "  " << endl;
+	textColor(48); cout << "  ";textColor(1); cout << " CCC     o   o n   n  t     r     a   a  c      t      M             M  e     "; textColor(48); cout << "  " << endl;
+	textColor(48); cout << "  ";textColor(1); cout << " CCCCCCC  ooo  n   n  tttt  r     aaaaaa ccccc  tttt  M               M eeeee "; textColor(48); cout << "  " << endl;
+	textColor(48);
+	cout << "                                                                                  " << endl;
+	textColor(15); // returning to white text
+}
+
+void printBye()
+{
+	cout << " " << endl
+		<< "                        .-''''-.     " << endl
+		<< "                       / .===. \\  " << endl
+		<< "                       \\/ 6 6 \\/  "<< endl
+		<< "                       ( \\___/ )  "<< endl
+		<< "  _________________ooo__\\_____/_____________________ " << endl
+		<< " /                                                  \\ " << endl
+		<< " |  Good bye & and thank you for using ContractMe!   | " << endl
+		<< " \\______________________________ooo_________________/ " << endl
+		<< "                        |  |  | " << endl
+		<< "                        |_ | _| " << endl
+		<< "                        |  |  | " << endl
+		<< "                        |__|__| " << endl
+		<< "                        /-'Y'-\\ " << endl
+		<< "                       (__/ \\__)  " << endl;
 }
 
 void mainmenu()
@@ -220,7 +298,20 @@ void ChooseMenu(int type, char *userInput)
 
 void tech()
 {
+	string problem;
+	cout << "\nHello, welcome to tech support.\n please describe your problem: " << endl;
+	cin >> problem;
+	cout << "\nThank you for your message, we will return to you with a solution asap " << endl;
+	ofstream inFile;
+	inFile.open("problem.txt", ios::app);
+	if (inFile.fail()) {
+		cout << "error opening file" << endl;
+		exit(1);
+	}
+	// inFile << problem << //   bad loop
 
+	inFile.close();
+	
 }
 
 void contractorMenu(char *userInput)
@@ -249,6 +340,7 @@ void contractorMenu(char *userInput)
 			break;
 		}
 	}
+	
 	inFile.close();
 
 	cout << "You worked " << workHours << " hours this month, and your salary is: " << (workHours * payPerHour) << endl;
@@ -263,6 +355,9 @@ void contractorMenu(char *userInput)
 			<< "3.Sign out" << endl;
 		cin >> choice;
 		switch (choice) {
+		case 0: // technical support
+			tech();
+			break;
 		case 1: //report work hours
 			cout << "Enter the hour u Started to work today: " << endl;
 			cin >> startHour;
@@ -282,7 +377,7 @@ void contractorMenu(char *userInput)
 			// now we need to add this day to the database:
 			// if he wants to add another vacation day, he can re enter this option.
 			break;
-		case 3: 
+		case 3:
 			// edit
 			break;
 		case 4:
@@ -331,11 +426,11 @@ bool checkUserExists(ifstream& inFile, char* userInput)
 }
 
 void statisticAnalysis() {
-	cout << "Hello," << endl 
-		<< "Companyâ€™s Statistic Analysis  "<< endl;
-	cout << "Contractor numbers: " << ContractorCount << endl 
-		 << "Contractor Hired: " << ContractorHired << endl
-		 << "Employer Numbers: " << EmployerCount << endl;
+	cout << "Hello," << endl
+		<< "Company’s Statistic Analysis  " << endl;
+	cout << "Contractor numbers: " << ContractorCount << endl
+		<< "Contractor Hired: " << ContractorHired << endl
+		<< "Employer Numbers: " << EmployerCount << endl;
 }
 
 void hrMenu(char *userInput)
@@ -350,6 +445,9 @@ void hrMenu(char *userInput)
 			<< "5.Sign out" << endl;
 		cin >> choice;
 		switch (choice) {
+		case 0: // technical support
+			tech();
+			break;
 		case 1:
 			statisticAnalysis();
 			break;
@@ -420,7 +518,7 @@ void monitorHiring() {
 		exit(1);
 	}
 	string getLine;
-	while(!inFile.eof()) {
+	while (!inFile.eof()) {
 		getline(inFile, getLine); // Skiping line
 		cout << getLine;
 		//cout << endl;
@@ -439,7 +537,7 @@ void workersFeed() {
 	char temp[N];
 	cout << "Hello, Please enter the username" << endl;
 	cin >> userName;
-	if(checkUserExists(inFile, userName)) {
+	if (checkUserExists(inFile, userName)) {
 		inFile >> temp; // skipping password field.
 		inFile >> temp; // reading fullname field.
 		cout << temp;
@@ -455,8 +553,8 @@ void workersFeed() {
 		while (!inFile.eof()) {
 			inFile >> temp;
 			inFile >> temp;
-			if(strcmp(temp,userName) ==0) {
-				while(temp != "UserName:") {
+			if (strcmp(temp, userName) == 0) {
+				while (temp != "UserName:") {
 					inFile >> temp;
 					cout << temp;
 					// cout << endl;
@@ -478,6 +576,9 @@ void employeerMenu(char *userInput)
 			<< "3.Sign out" << endl;
 		cin >> choice;
 		switch (choice) {
+		case 0: // technical support
+			tech();
+			break;
 		case 1:
 			hiringHistory(userInput);
 			break;
@@ -499,10 +600,10 @@ void hiringHistory(char* currentUser) {
 	inFile.open("HiringHistory.txt");
 	while (!inFile.eof()) {
 		inFile >> temp;
-		if(strcmp(temp,"UserName:")) {
+		if (strcmp(temp, "UserName:")) {
 			inFile >> temp;
-			if(strcmp(temp,currentUser)) {
-				while(strcmp(temp,"UserName:")!=0) {
+			if (strcmp(temp, currentUser)) {
+				while (strcmp(temp, "UserName:") != 0) {
 					inFile >> temp;
 					cout << temp;
 				}
@@ -534,46 +635,46 @@ string calendar(char* currentUser) {
 	int month, day;
 	do {
 		cout << "Enter your month (1-12)" << endl
-			 << "1 - January " << endl
-			 << "2 - February " << endl
-			 << "3 - March " << endl
-			 << "4 - April " << endl
-			 << "5 - May " << endl
-			 << "6 - June " << endl
-			 << "7 - July " << endl
-			 << "8 - August " << endl
-			 << "9 - September " << endl
-			 << "10 - October " << endl
-			 << "11 - November " << endl
-			 << "12 - December " << endl;
+			<< "1 - January " << endl
+			<< "2 - February " << endl
+			<< "3 - March " << endl
+			<< "4 - April " << endl
+			<< "5 - May " << endl
+			<< "6 - June " << endl
+			<< "7 - July " << endl
+			<< "8 - August " << endl
+			<< "9 - September " << endl
+			<< "10 - October " << endl
+			<< "11 - November " << endl
+			<< "12 - December " << endl;
 		cin >> month;
-		if(month < 1 || month > 12) {
-			cout << "Error, Month must be between 1 and 12 Try again, " 
-				 << currentUser << endl;
+		if (month < 1 || month > 12) {
+			cout << "Error, Month must be between 1 and 12 Try again, "
+				<< currentUser << endl;
 		}
-	}while(month < 1 || month > 12);
+	} while (month < 1 || month > 12);
 	do {
 		cout << "Enter day" << endl;
 		cin >> day;
-	if ((month == 1) || (month == 3) || (month == 5) || (month == 7) || (month == 8) || (month == 10) || (month == 12)) {
-		if ((day < 1) || (day > 31))
-			cout << "Error, in Months 1,3,5,7,8,10,12 the Day must be between 1 and 31\nTry again, "
-			 	 << currentUser << endl;
-		else break;
-	}
-	else if ((month == 4) || (month == 6) || (month == 9) || (month == 11)) {
-		if ((day < 1) || (day > 31))
-			cout << "Error, in Months 4,6,9,11 the Day must be between 1 and 30\nTry again, "
-				  << currentUser << endl;
-		else break;
-	}
-	else {
-		if ((day < 1) || (day > 28))
-			cout << "Error, in Month February the Day must be between 1 and 28\nTry again, "
+		if ((month == 1) || (month == 3) || (month == 5) || (month == 7) || (month == 8) || (month == 10) || (month == 12)) {
+			if ((day < 1) || (day > 31))
+				cout << "Error, in Months 1,3,5,7,8,10,12 the Day must be between 1 and 31\nTry again, "
 				<< currentUser << endl;
-		else break;
-	}
-	}while(1);
+			else break;
+		}
+		else if ((month == 4) || (month == 6) || (month == 9) || (month == 11)) {
+			if ((day < 1) || (day > 31))
+				cout << "Error, in Months 4,6,9,11 the Day must be between 1 and 30\nTry again, "
+				<< currentUser << endl;
+			else break;
+		}
+		else {
+			if ((day < 1) || (day > 28))
+				cout << "Error, in Month February the Day must be between 1 and 28\nTry again, "
+				<< currentUser << endl;
+			else break;
+		}
+	} while (1);
 	ostringstream oss;
 	oss << day << "/" << month;
 	string date = oss.str();
