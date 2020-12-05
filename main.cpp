@@ -5,6 +5,7 @@
 #include <string>
 #include <cstring>
 #include <algorithm>
+#include <sstream>
 
 using namespace std;
 #define _CRT_SECURE_NO_WARNINGS
@@ -17,7 +18,7 @@ const int CONTRACTOR_TYPE = 3;
 int ContractorCount = 0; // Contractor user count.
 int ContractorHired = 0;
 int EmployerCount = 0;  // Employer user count.
-typedef enum { Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec } Month;
+
 
 typedef struct {
 	char *fullName;
@@ -34,7 +35,6 @@ typedef struct {
 
 typedef struct {
 	int day;
-	Month month;
 	int startTime;
 	int endTime;
 }WorkDay;
@@ -42,12 +42,11 @@ typedef struct {
 
 
 void mainmenu();
+string calendar(char*);
 void login();
 void signUp();
 void writeUserToFile(User);
 void tech();
-void employeerMenu(char *userInput);
-void contractorMenu(char *userInput);
 bool checkUserExists(ifstream&, char*);
 void ChooseMenu(int type, char *userInput);
 void lowercase(char*);
@@ -56,7 +55,14 @@ int calculateHours(int start, int finish);
 void hrMenu(char *userInput);
 void statisticAnalysis();
 void addNewWorker();
+void monitorHiring();
+void workersFeed();
 
+void employeerMenu(char *userInput);
+void hiringHistory(char*);
+void searchContractor(char*);
+
+void contractorMenu(char *userInput);
 
 
 int main()
@@ -69,7 +75,7 @@ int main()
 	cout << "CCCCCC   ooo   n   n   tttt  r      aaaaaa  cccc   tttt  M                M  eeee " << endl;
 
 	cout << "\n\n\n+++++++++++++++++++++++++++++++++++++++++++\n+++  HELLO! :), welcome to ContractMe!  +++  (for technical support press '0' at anytime)\n+++++++++++++++++++++++++++++++++++++++++++\n" << endl;
-
+	calendar("Maayan");
 	mainmenu();
 
 	// Good Bye message with hand gesture :DD
@@ -217,66 +223,6 @@ void tech()
 
 }
 
-void hrMenu(char *userInput)
-{
-	int choice = 0;
-	while (choice != 5) {
-		cout << "Hello, welcome to the HR Menu, what do you want to do next? " << endl
-			<< "1.Statistic Analysis" << endl
-			<< "2.Monitor Hiring" << endl
-			<< "3.Add New Worker" << endl
-			<< "4.Workers Feed" << endl
-			<< "5.Sign out" << endl;
-		cin >> choice;
-		switch (choice) {
-		case 1:
-			statisticAnalysis();
-			break;
-		case 2:
-			monitorHiring();
-			break;
-		case 3:
-			addNewWorker();
-			break;
-		case 4:
-			workersFeed();
-			break;
-		case 5:
-			cout << "Signed out of the system." << endl;
-			break;
-		default:
-			cout << "Please enter choice between 1-5 only, 5 to sign out." << endl;
-		}
-	}
-}
-
-void employeerMenu(char *userInput)
-{
-	int choice = 0;
-	while (choice != 3) {
-		cout << "Hello, welcome to the Employeer Menu, what do you want to do next? " << endl
-			<< "1.Hiring History" << endl
-			<< "2.Search Contractor" << endl
-			<< "3.Sign out" << endl;
-		cin >> choice;
-		switch (choice) {
-		case 1:
-			//hiringHistory();
-			break;
-		case 2:
-			//searchContractor();
-			//ContractorList.txt
-
-			break;
-		case 3:
-			cout << "Signed out of the system." << endl;
-			break;
-		default:
-			cout << "Please enter choice between 1-3 only, 3 to sign out." << endl;
-		}
-	}
-}
-
 void contractorMenu(char *userInput)
 {
 	//// name username password type workHours payPerHour NotAvailable(DayOfMonth)
@@ -392,8 +338,41 @@ void statisticAnalysis() {
 		 << "Employer Numbers: " << EmployerCount << endl;
 }
 
+void hrMenu(char *userInput)
+{
+	int choice = 0;
+	while (choice != 5) {
+		cout << "Hello, welcome to the HR Menu, what do you want to do next? " << endl
+			<< "1.Statistic Analysis" << endl
+			<< "2.Monitor Hiring" << endl
+			<< "3.Add New Worker" << endl
+			<< "4.Workers Feed" << endl
+			<< "5.Sign out" << endl;
+		cin >> choice;
+		switch (choice) {
+		case 1:
+			statisticAnalysis();
+			break;
+		case 2:
+			monitorHiring();
+			break;
+		case 3:
+			addNewWorker();
+			break;
+		case 4:
+			workersFeed();
+			break;
+		case 5:
+			cout << "Signed out of the system." << endl;
+			break;
+		default:
+			cout << "Please enter choice between 1-5 only, 5 to sign out." << endl;
+		}
+	}
+}
+
 void addNewWorker() {
-	char username[N], fullName[N], interests[N], place[N];
+	char username[N], fullName[N], skills[N], place[N];
 	int password, wage;
 	cout << "Hello, welcome to add a new worker " << endl;
 	cout << "Enter username: ";
@@ -405,7 +384,7 @@ void addNewWorker() {
 	cout << endl << "Enter wage: ";
 	cin >> wage;
 	cout << endl << "Enter intersts: ";
-	cin >> interests;
+	cin >> skills;
 	cout << endl << "Enter place: ";
 	cin >> place;
 	ofstream inFile;
@@ -419,7 +398,7 @@ void addNewWorker() {
 	inFile << fullName << " ";
 	inFile << CONTRACTOR_TYPE << " ";
 	inFile << wage << " ";
-	inFile << interests << " ";
+	inFile << skills << " ";
 	inFile << place << " ";
 	inFile.close();
 	inFile.open("workHistory.txt", ios::app);
@@ -467,7 +446,7 @@ void workersFeed() {
 		inFile >> temp; // skipping user Type.
 		inFile >> temp; // reading wage field.
 		cout << temp;
-		inFile >> temp; // reading interests field.
+		inFile >> temp; // reading skills field.
 		cout << temp;
 		inFile >> temp; // reading place field.
 		cout << temp;
@@ -489,9 +468,114 @@ void workersFeed() {
 	inFile.close();
 }
 
+void employeerMenu(char *userInput)
+{
+	int choice = 0;
+	while (choice != 3) {
+		cout << "Hello, welcome to the Employeer Menu, what do you want to do next? " << endl
+			<< "1.Hiring History" << endl
+			<< "2.Search Contractor" << endl
+			<< "3.Sign out" << endl;
+		cin >> choice;
+		switch (choice) {
+		case 1:
+			hiringHistory(userInput);
+			break;
+		case 2:
+			searchContractor(userInput);
+			break;
+		case 3:
+			cout << "Signed out of the system." << endl;
+			break;
+		default:
+			cout << "Please enter choice between 1-3 only, 3 to sign out." << endl;
+		}
+	}
+}
 
-/*
-username: nams
-reporteddays: asdas
-userName: 
-*/
+void hiringHistory(char* currentUser) {
+	ifstream inFile;
+	char temp[N];
+	inFile.open("HiringHistory.txt");
+	while (!inFile.eof()) {
+		inFile >> temp;
+		if(strcmp(temp,"UserName:")) {
+			inFile >> temp;
+			if(strcmp(temp,currentUser)) {
+				while(strcmp(temp,"UserName:")!=0) {
+					inFile >> temp;
+					cout << temp;
+				}
+				inFile.close();
+				return;
+			}
+		}
+	}
+	inFile.close();
+}
+
+void searchContractor(char* currentUser) {
+	char location[N], skills[N];
+	int minWage, maxWage;
+	string date;
+	cout << "Enter location ( 0 if not needed)" << endl;
+	cin >> location;
+	cout << "Enter Skills ( 0 if not needed)" << endl;
+	cin >> skills;
+	cout << "Enter minimum wage ( 0 if not needed)" << endl;
+	cin >> minWage;
+	cout << "Enter maxWage ( 0 if not needed)" << endl;
+	cin >> maxWage;
+	cout << "Enter date ( 0 if not needed)" << endl;
+	date = calendar(currentUser);
+}
+
+string calendar(char* currentUser) {
+	int month, day;
+	do {
+		cout << "Enter your month (1-12)" << endl
+			 << "1 - January " << endl
+			 << "2 - February " << endl
+			 << "3 - March " << endl
+			 << "4 - April " << endl
+			 << "5 - May " << endl
+			 << "6 - June " << endl
+			 << "7 - July " << endl
+			 << "8 - August " << endl
+			 << "9 - September " << endl
+			 << "10 - October " << endl
+			 << "11 - November " << endl
+			 << "12 - December " << endl;
+		cin >> month;
+		if(month < 1 || month > 12) {
+			cout << "Error, Month must be between 1 and 12 Try again, " 
+				 << currentUser << endl;
+		}
+	}while(month < 1 || month > 12);
+	do {
+		cout << "Enter day" << endl;
+		cin >> day;
+	if ((month == 1) || (month == 3) || (month == 5) || (month == 7) || (month == 8) || (month == 10) || (month == 12)) {
+		if ((day < 1) || (day > 31))
+			cout << "Error, in Months 1,3,5,7,8,10,12 the Day must be between 1 and 31\nTry again, "
+			 	 << currentUser << endl;
+		else break;
+	}
+	else if ((month == 4) || (month == 6) || (month == 9) || (month == 11)) {
+		if ((day < 1) || (day > 31))
+			cout << "Error, in Months 4,6,9,11 the Day must be between 1 and 30\nTry again, "
+				  << currentUser << endl;
+		else break;
+	}
+	else {
+		if ((day < 1) || (day > 28))
+			cout << "Error, in Month February the Day must be between 1 and 28\nTry again, "
+				<< currentUser << endl;
+		else break;
+	}
+	}while(1);
+	ostringstream oss;
+	oss << day << "/" << month;
+	string date = oss.str();
+	return date;
+}
