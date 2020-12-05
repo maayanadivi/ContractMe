@@ -8,19 +8,20 @@
 
 using namespace std;
 #define _CRT_SECURE_NO_WARNINGS
-#define N 30  // max char for username
+#define N 40  // max char for username
 
 const int HR_TYPE = 1;
 const int EMPLOYEER_TYPE = 2;
 const int CONTRACTOR_TYPE = 3;
 
 int ContractorCount = 0; // Contractor user count.
+int ContractorHired = 0;
 int EmployerCount = 0;  // Employer user count.
 typedef enum { Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec } Month;
 
 typedef struct {
-	char *name;  // name +last name 
-	char *username;  // username
+	char *fullName;
+	char *username;
 	char *password;
 	int UserType = 0;  //  1 = HR  ,  2 = Employeer  ,  3 = Contractor
 } User;
@@ -45,13 +46,16 @@ void login();
 void signUp();
 void writeUserToFile(User);
 void tech();
-void hrMenu(char *userInput);
 void employeerMenu(char *userInput);
 void contractorMenu(char *userInput);
-void ChooseMenu(int type, char *userInput);
 bool checkUserExists(ifstream&, char*);
+void ChooseMenu(int type, char *userInput);
 void lowercase(char*);
 int calculateHours(int start, int finish);
+
+void hrMenu(char *userInput);
+void statisticAnalysis();
+void addNewWorker();
 
 
 
@@ -163,7 +167,7 @@ void signUp() // only Employer can signup
 			<< "Enter another username " << endl;
 		cin >> username;
 	}
-	u1.name = name;
+	u1.fullName = name;
 	u1.username = username;
 	u1.password = password;
 	u1.UserType = EMPLOYEER_TYPE;  // employer 
@@ -182,12 +186,19 @@ void writeUserToFile(User newUser)
 		exit(1);
 	}
 	inFile << "\n";
-	inFile << newUser.name << " ";
 	inFile << newUser.username << " ";
 	inFile << newUser.password << " ";
+	inFile << newUser.fullName << " ";
 	inFile << newUser.UserType << " ";
-	//if (newUser.UserType == 3) // if its contractor
-	//	inFile << newUser.salary;
+	inFile.close();
+	inFile.open("HiringHistory.txt", ios::app);
+	if (inFile.fail()) {
+		cout << "error opening file" << endl;
+		exit(1);
+	}
+	inFile << "UserName: " << newUser.username << endl;
+	inFile << "HiringHistory: ";
+	inFile << endl;
 	inFile.close();
 }
 
@@ -219,16 +230,16 @@ void hrMenu(char *userInput)
 		cin >> choice;
 		switch (choice) {
 		case 1:
-			//statisticAnalysis();
+			statisticAnalysis();
 			break;
 		case 2:
-			//monitorHiring();
+			monitorHiring();
 			break;
 		case 3:
-			//addNewWorker();
+			addNewWorker();
 			break;
 		case 4:
-			//workersFeed();
+			workersFeed();
 			break;
 		case 5:
 			cout << "Signed out of the system." << endl;
@@ -325,7 +336,10 @@ void contractorMenu(char *userInput)
 			// now we need to add this day to the database:
 			// if he wants to add another vacation day, he can re enter this option.
 			break;
-		case 3:
+		case 3: 
+			// edit
+			break;
+		case 4:
 			cout << "Signed out of the system." << endl;
 			break;
 		default:
@@ -335,7 +349,7 @@ void contractorMenu(char *userInput)
 }
 
 //  
-// HELPERS FUNCTIONS
+// HELPERS FUNCTION
 // 
 
 int calculateHours(int start, int finish) // example:: start = 8, finish = 17 ... => = 9 hours
@@ -361,7 +375,6 @@ bool checkUserExists(ifstream& inFile, char* userInput)
 	char* checkInput = new char[strlen(userInput) + 1];
 	string skipLine;
 	while (!inFile.eof()) {
-		inFile >> checkInput; // Ignoring first word.
 		inFile >> checkInput; // Getting the UserName field from the file.
 		if (strcmp(checkInput, userInput) == 0) {
 			return true;
@@ -370,3 +383,115 @@ bool checkUserExists(ifstream& inFile, char* userInput)
 	}
 	return false; // If no matching user was found.
 }
+
+void statisticAnalysis() {
+	cout << "Hello," << endl 
+		<< "Company’s Statistic Analysis  "<< endl;
+	cout << "Contractor numbers: " << ContractorCount << endl 
+		 << "Contractor Hired: " << ContractorHired << endl
+		 << "Employer Numbers: " << EmployerCount << endl;
+}
+
+void addNewWorker() {
+	char username[N], fullName[N], interests[N], place[N];
+	int password, wage;
+	cout << "Hello, welcome to add a new worker " << endl;
+	cout << "Enter username: ";
+	cin >> username;
+	cout << endl << "Enter password: ";
+	cin >> password;
+	cout << endl << "Enter full name: ";
+	cin >> fullName;
+	cout << endl << "Enter wage: ";
+	cin >> wage;
+	cout << endl << "Enter intersts: ";
+	cin >> interests;
+	cout << endl << "Enter place: ";
+	cin >> place;
+	ofstream inFile;
+	inFile.open("database.txt", ios::app);
+	if (inFile.fail()) {
+		cout << "error opening file" << endl;
+		exit(1);
+	}
+	inFile << username << " ";
+	inFile << password << " ";
+	inFile << fullName << " ";
+	inFile << CONTRACTOR_TYPE << " ";
+	inFile << wage << " ";
+	inFile << interests << " ";
+	inFile << place << " ";
+	inFile.close();
+	inFile.open("workHistory.txt", ios::app);
+	if (inFile.fail()) {
+		cout << "error opening file" << endl;
+		exit(1);
+	}
+	inFile << "UserName: " << username << endl;
+	inFile << "ReportedDays: ";
+	inFile << endl;
+	inFile.close();
+}
+
+void monitorHiring() {
+	fstream inFile;
+	inFile.open("HiringHistory.txt");
+	if (inFile.fail()) {
+		cout << "error opening file" << endl;
+		exit(1);
+	}
+	string getLine;
+	while(!inFile.eof()) {
+		getline(inFile, getLine); // Skiping line
+		cout << getLine;
+		//cout << endl;
+	}
+	inFile.close();
+}
+
+void workersFeed() {
+	ifstream inFile;
+	inFile.open("database.txt");
+	if (inFile.fail()) {
+		cout << "error opening file" << endl;
+		exit(1);
+	}
+	char userName[N];
+	char temp[N];
+	cout << "Hello, Please enter the username" << endl;
+	cin >> userName;
+	if(checkUserExists(inFile, userName)) {
+		inFile >> temp; // skipping password field.
+		inFile >> temp; // reading fullname field.
+		cout << temp;
+		inFile >> temp; // skipping user Type.
+		inFile >> temp; // reading wage field.
+		cout << temp;
+		inFile >> temp; // reading interests field.
+		cout << temp;
+		inFile >> temp; // reading place field.
+		cout << temp;
+		inFile.close();
+		inFile.open("workHistory.txt");
+		while (!inFile.eof()) {
+			inFile >> temp;
+			inFile >> temp;
+			if(strcmp(temp,userName) ==0) {
+				while(temp != "UserName:") {
+					inFile >> temp;
+					cout << temp;
+					// cout << endl;
+				}
+			}
+		}
+	}
+	else cout << "User does not exist." << endl;
+	inFile.close();
+}
+
+
+/*
+username: nams
+reporteddays: asdas
+userName: 
+*/
