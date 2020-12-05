@@ -72,24 +72,7 @@ void contractorMenu(char *userInput);
 
 int main()
 {
-	//system("color 1");  // cmd background color
-	//textColor(1);
-
-	//color tester
-	/*HANDLE  hConsole;
-	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	int k=0;
-	SetConsoleTextAttribute(hConsole, k);
-	for (k = 1; k < 255; k++)
-	{
-		// pick the colorattribute k you want
-		SetConsoleTextAttribute(hConsole, k);
-		cout << k << " I want to be nice today!" << endl;
-	}
-	*/
-	
 	ourLogo(); // function to print our logo
-
 
 	textColor(15);
 	cout << endl << endl
@@ -97,7 +80,7 @@ int main()
 		 <<"+++  HELLO! :), welcome to ContractMe!  +++  (for technical support press '0' at anytime)" << endl
 		 <<"+++++++++++++++++++++++++++++++++++++++++++" << endl;
 
-	textColor(15); // white text
+	textColor(15); // changing back to white text
 	//calendar("Maayan");
 	mainmenu();
 
@@ -109,18 +92,6 @@ int main()
 
 void textColor(int textcolor)  // function to switch text colors
 {
-	/*
-	0 = black
-	1 = dark blue
-	3 = dark cyan
-	9 = blue
-	11 = cyan
-	15 = white
-	31 = white text on blue background
-	240 = black text on white background
-	241 = dark blue text on white background
-	249 = blue text on white background
-	*/
 	HANDLE  hConsole;
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(hConsole, textcolor);
