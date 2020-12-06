@@ -1,4 +1,5 @@
 #pragma once
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <windows.h> 
 #include <conio.h>
@@ -11,8 +12,8 @@
 #include <sstream>
 
 using namespace std;
-#define _CRT_SECURE_NO_WARNINGS
 #define N 40  // max char for username
+#define currentYear 2020
 
 const int HR_TYPE = 1;
 const int EMPLOYEER_TYPE = 2;
@@ -40,6 +41,8 @@ typedef struct {
 
 typedef struct {
 	int day;
+	int month;
+	int year;
 	int startTime;
 	int endTime;
 }WorkDay;
@@ -49,7 +52,7 @@ void textColor(int textcolor);
 void ourLogo();
 void printBye();
 void mainmenu();
-string calendar(char*);
+WorkDay calendar(char*);
 void writeHRtoFile();
 void login();
 void signUp();
@@ -69,6 +72,9 @@ void workersFeed();
 void employeerMenu(char *userInput);
 void hiringHistory(char*);
 void searchContractor(char*);
+bool checkSkills(char** skills, int lenght, char* skill);
+void bookContractor(const char * username, char* currentUser, WorkDay date);
+bool checkDate(WorkDay date, char* userName);
 
 void contractorMenu(char *userInput);
 
@@ -245,7 +251,7 @@ void signUp() // only Employer can signup
 
 	// Username in database must be unique.
 	ifstream inFile;
-	inFile.open("database.txt");
+	inFile.open("database.txt", ios::app);
 	if (inFile.fail()) {
 		cerr << "error opening file" << endl;
 		exit(1);
@@ -284,8 +290,8 @@ void writeUserToFile(User newUser)
 		cout << "error opening file" << endl;
 		exit(1);
 	}
-	inFile << "UserName: " << newUser.username << endl;
-	inFile << "HiringHistory: ";
+	inFile << "UserName:" << newUser.username << endl;
+	inFile << "HiringHistory:";
 	inFile << endl;
 	inFile.close();
 }
@@ -306,15 +312,6 @@ void tech()
 	cout << "\nHello, welcome to tech support.\n please describe your problem: " << endl;
 	cin >> problem;
 	cout << "\nThank you for your message, we will return to you with a solution asap " << endl;
-	ofstream inFile;
-	inFile.open("problem.txt", ios::app);
-	if (inFile.fail()) {
-		cout << "error opening file" << endl;
-		exit(1);
-	}
-	// inFile << problem << //   bad loop
-
-	inFile.close();
 
 }
 
@@ -474,8 +471,8 @@ void hrMenu(char *userInput)
 }
 
 void addNewWorker() {
-	char username[N], fullName[N], skills[N], place[N];
-	int password, wage;
+	char username[N], fullName[N], place[N], temp[N];
+	int password, wage, numberSkills;
 	cout << "Hello, welcome to add a new worker " << endl;
 	cout << "Enter username: ";
 	cin >> username;
@@ -485,11 +482,24 @@ void addNewWorker() {
 	cin >> fullName;
 	cout << endl << "Enter wage: ";
 	cin >> wage;
-	cout << endl << "Enter intersts: ";
-	cin >> skills;
+	cout << "enter how much interes the contractor has :";
+	cin >> numberSkills;
+	char **skills = new char*[numberSkills];
+	if (*skills == NULL)
+	{
+		cout << "cannot allocate memory" << endl;
+		return;
+	}
+	for (int i = 0; i < numberSkills; ++i)
+	{
+		cout << endl << "Enter intersts: ";
+		cin >> temp;
+		skills[i] = new char[strlen(temp)];
+		strcpy(skills[i], temp);
+	}
 	cout << endl << "Enter place: ";
 	cin >> place;
-	ofstream inFile;
+	fstream inFile;
 	inFile.open("database.txt", ios::app);
 	if (inFile.fail()) {
 		cout << "error opening file" << endl;
@@ -501,7 +511,11 @@ void addNewWorker() {
 	inFile << fullName << " ";
 	inFile << CONTRACTOR_TYPE << " ";
 	inFile << wage << " ";
-	inFile << skills << " ";
+	inFile << numberSkills << " ";
+	for (int i = 0; i < numberSkills; ++i)
+	{
+		inFile << skills[i] << " ";
+	}
 	inFile << place << " ";
 	inFile.close();
 	inFile.open("workHistory.txt", ios::app);
@@ -509,9 +523,13 @@ void addNewWorker() {
 		cout << "error opening file" << endl;
 		exit(1);
 	}
-	inFile << "UserName: " << username << endl;
-	inFile << "ReportedDays: ";
+	inFile << "UserName:" << username << endl;
+	inFile << "workHistory:";
+	inFile << "workDay:";
 	inFile << endl;
+	/*for (int i = 0; i < numberSkills; ++i)
+		delete skills[i];
+	delete skills;*/
 	inFile.close();
 }
 
@@ -622,51 +640,193 @@ void hiringHistory(char* currentUser) {
 }
 
 void searchContractor(char* currentUser) {
-	char location[N], skills[N];
+	char location[N], skill[N], temp[N];
 	int minWage, maxWage;
-	string date;
+	WorkDay date;
 	cout << "Enter location ( 0 if not needed)" << endl;
 	cin >> location;
 	cout << "Enter Skills ( 0 if not needed)" << endl;
-	cin >> skills;
+	cin >> skill;
 	cout << "Enter minimum wage ( 0 if not needed)" << endl;
 	cin >> minWage;
 	cout << "Enter maxWage ( 0 if not needed)" << endl;
 	cin >> maxWage;
 	cout << "Enter date ( 0 if not needed)" << endl;
 	date = calendar(currentUser);
-	//fstream inFile;
-	//inFile.open("database.txt");
-	//int checkType;
-	//Contractor user;
-	//while(inFile.eof()){
-	//	inFile >> checkType;//קולט את סוג המשתמש בהנחה שהוא הנתון הראשון
-	//	if (checkType == 3)//רק אם הסוג הוא 3 קולט את כל הנתונים
-	//	{
-	//		inFile >> user.details.username;
-	//		inFile >> user.details.password;
-	//		inFile >> user.details.fullName;
-	//		inFile >> user.salary;
-	//		inFile >> user.interes;
-	//		inFile >> user.place;
-	//		if (user.place == location || location == 0)//
-	//		{
-	//			if (user.interes == skills || skills == 0)
-	//			{
-	//				if ((user.salary > minWage && user.salary < maxWage) || minWage == 0 || maxWage == 0)
-	//				{
-	//					if (!chackDate(date))//שליחה להאם התאריך נמצא ברשימת תאריכי עבודה של הקבלן
-	//						printContracror(user);//שליחה להדפסת קבלן
-	//				}
-	//			}
-	//		}
-	//	}
+	fstream inFile;
+	inFile.open("database.txt");
+	if (inFile.fail()) {
+		cout << "error opening file" << endl;
+		exit(1);
+	}
+	int checkType;
+	char UserName[N];
+	int userPass, userNumSkills;
+	char userUsername[N];
+	int userSalary;
+	char userPlace[N];
+	cout << "searching workers for:" << skill << "/t";
+	cout << date.day << "/" << date.month << "/" << date.year << endl;
+	while (!inFile.eof()) {
+		inFile >> userUsername;
+		inFile >> userPass;
+		inFile >> UserName;
+		inFile >> checkType;
+		if (checkType == CONTRACTOR_TYPE)//if the user is contractor 
+		{
+			inFile >> userSalary;
+			inFile >> userNumSkills;
+			char **userSkills = new char*[userNumSkills];
+			if (userSkills == NULL)
+			{
+				cout << "cannot allocate memory" << endl;
+				return;
+			}
+			for (int i = 0; i < userNumSkills; ++i) {
 
-	//}
+				inFile >> temp;
+				userSkills[i] = new char[strlen(temp)];
+				if (userSkills[i] == NULL)
+				{
+					cout << "cannot allocate memory" << endl;
+					return;
+				}
+				strcpy(userSkills[i], temp);
+			}
+			inFile >> userPlace;
+			if (userPlace == location || location == 0)
+			{
+				if (checkSkills(userSkills, userNumSkills, skill) || skill == 0)
+				{
+					if ((userSalary > minWage && userSalary < maxWage) || (minWage < userSalary&& maxWage == 0))
+					{
+						if (checkDate(date, userUsername))//check if the contractor is available
+						{
+							cout << UserName << endl;
+							cout << userSalary << endl;
+							for (int i = 0; i < userNumSkills; ++i) {
+								cout << userSkills[i];
+								cout << ",";
+							}
+
+						}
+					}
+				}
+			}
+		}
+
+	}
+
+	cout << "please enter the name of the contractor you want to book" << endl;
+	cin >> UserName;
+	bookContractor(UserName, currentUser, date);
+	inFile.close();
 }
 
-string calendar(char* currentUser) {
-	int month, day;
+bool checkSkills(char** skills, int length, char* skill)
+{
+	for (int i = 0; i < length; ++i)
+		if (skills[i] == skill)
+			return true;
+	return false;
+}
+
+bool checkDate(WorkDay date, char* userName)
+{
+	char tempUser[N];
+	WorkDay temp; //temp date
+	fstream inFile;
+	inFile.open("workHistory.txt");
+	if (inFile.fail()) {
+		cout << "error opening file" << endl;
+		exit(1);
+	}
+	inFile >> tempUser;
+	while (inFile.eof())
+	{
+		if (tempUser == "username:")
+		{
+			inFile >> tempUser;
+			if (tempUser == userName)
+			{
+				inFile << tempUser;
+				if (tempUser == "workDay:")
+				{
+					inFile >> temp.day;
+					inFile >> temp.month;
+					inFile >> temp.year;
+					inFile >> temp.startTime;
+					inFile >> temp.endTime;
+					if (temp.day == date.day)
+						if (temp.month == date.month)
+							if (temp.year == date.year)
+								if (temp.startTime != 0 && temp.endTime != 0)
+									return true;
+				}
+
+
+			}
+			return false;
+		}
+	}
+	inFile.close();
+}
+
+void bookContractor(const char * username, char* currentUser, WorkDay date)
+{
+	char temp[N];
+	fstream inFile;
+	inFile.open("workHistory.txt", ios::app);
+	if (inFile.fail()) {
+		cout << "error opening file" << endl;
+		exit(1);
+	}
+	while (inFile.eof())
+	{
+		inFile >> temp;
+		if (temp == "UserName:")
+		{
+			inFile >> temp;
+			if (strcmp(username, temp))
+			{
+				inFile >> temp;//skipping the "workHistory"
+				inFile << date.day;
+				inFile << date.month;
+				inFile << date.year;
+			}
+
+		}
+	}
+	inFile.close();
+	fstream File;
+	File.open("HiringHistory.txt", ios::app);
+	if (File.fail()) {
+		cout << "error opening file" << endl;
+		exit(1);
+	}
+	while (File.eof())
+	{
+		File >> temp;
+		if (temp == "UserName:")
+		{
+			File >> temp;
+			if (strcmp(temp, currentUser))
+			{
+				File >> temp;//skipping the "HiringHistory"
+				//להוסיף שכר ויכולות
+				File << date.day;
+				File << date.month;
+				File << date.year;
+			}
+
+		}
+	}
+	File.close();
+
+}
+
+WorkDay calendar(char* currentUser) {
+	int month, day, year;
 	do {
 		cout << "Enter your month (1-12)" << endl
 			<< "1 - January " << endl
@@ -709,8 +869,17 @@ string calendar(char* currentUser) {
 			else break;
 		}
 	} while (1);
-	ostringstream oss;
-	oss << day << "/" << month;
+	do {
+		cout << "enter year: ";
+		cin >> year;
+	} while (year < currentYear);
+	/*ostringstream oss;
+	oss << day << "/" << month << "/" << year;
 	string date = oss.str();
-	return date;
+	return date;*/
+	WorkDay temp;
+	temp.day = day;
+	temp.month = month;
+	temp.year = year;
+	return temp;
 }
