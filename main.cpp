@@ -33,6 +33,8 @@ typedef struct {
 typedef struct {
 	User details;
 	int salary;
+	char place[N];
+	char interes[N];
 	//WorkDay *workDay;
 }Contractor;
 
@@ -48,6 +50,7 @@ void ourLogo();
 void printBye();
 void mainmenu();
 string calendar(char*);
+void writeHRtoFile();
 void login();
 void signUp();
 void writeUserToFile(User);
@@ -76,9 +79,9 @@ int main()
 
 	textColor(15);
 	cout << endl << endl
-		 <<"+++++++++++++++++++++++++++++++++++++++++++" << endl
-		 <<"+++  HELLO! :), welcome to ContractMe!  +++  (for technical support press '0' at anytime)" << endl
-		 <<"+++++++++++++++++++++++++++++++++++++++++++" << endl;
+		<< "+++++++++++++++++++++++++++++++++++++++++++" << endl
+		<< "+++  HELLO! :), welcome to ContractMe!  +++  (for technical support press '0' at anytime)" << endl
+		<< "+++++++++++++++++++++++++++++++++++++++++++" << endl;
 
 	textColor(15); // changing back to white text
 	//calendar("Maayan");
@@ -101,12 +104,12 @@ void ourLogo() // func to print our logo
 {
 	textColor(48);
 	cout << "                                                                                  " << endl;
-	textColor(48); cout << "  ";textColor(1); cout << " CCCCCCC                                                   M     M            "; textColor(48); cout << "  " << endl;
-	textColor(48); cout << "  ";textColor(1); cout << " CCC           n      t                         t         MMM   MMM     eeeee "; textColor(48); cout << "  " << endl;
-	textColor(48); cout << "  ";textColor(1); cout << " CC       ooo  nnnn  ttt   r rrrr aaaaa  ccccc ttt       M   M M   M    e     "; textColor(48); cout << "  " << endl;
-	textColor(48); cout << "  ";textColor(1); cout << " CC      o   o n   n  t     r     a   a  c      t       M     M     M   eeee  "; textColor(48); cout << "  " << endl;
-	textColor(48); cout << "  ";textColor(1); cout << " CCC     o   o n   n  t     r     a   a  c      t      M             M  e     "; textColor(48); cout << "  " << endl;
-	textColor(48); cout << "  ";textColor(1); cout << " CCCCCCC  ooo  n   n  tttt  r     aaaaaa ccccc  tttt  M               M eeeee "; textColor(48); cout << "  " << endl;
+	textColor(48); cout << "  "; textColor(1); cout << " CCCCCCC                                                   M     M            "; textColor(48); cout << "  " << endl;
+	textColor(48); cout << "  "; textColor(1); cout << " CCC           n      t                         t         MMM   MMM     eeeee "; textColor(48); cout << "  " << endl;
+	textColor(48); cout << "  "; textColor(1); cout << " CC       ooo  nnnn  ttt   r rrrr aaaaa  ccccc ttt       M   M M   M    e     "; textColor(48); cout << "  " << endl;
+	textColor(48); cout << "  "; textColor(1); cout << " CC      o   o n   n  t     r     a   a  c      t       M     M     M   eeee  "; textColor(48); cout << "  " << endl;
+	textColor(48); cout << "  "; textColor(1); cout << " CCC     o   o n   n  t     r     a   a  c      t      M             M  e     "; textColor(48); cout << "  " << endl;
+	textColor(48); cout << "  "; textColor(1); cout << " CCCCCCC  ooo  n   n  tttt  r     aaaaaa ccccc  tttt  M               M eeeee "; textColor(48); cout << "  " << endl;
 	textColor(48);
 	cout << "                                                                                  " << endl;
 	textColor(15); // returning to white text
@@ -117,8 +120,8 @@ void printBye()
 	cout << " " << endl
 		<< "                        .-''''-.     " << endl
 		<< "                       / .===. \\  " << endl
-		<< "                       \\/ 6 6 \\/  "<< endl
-		<< "                       ( \\___/ )  "<< endl
+		<< "                       \\/ 6 6 \\/  " << endl
+		<< "                       ( \\___/ )  " << endl
 		<< "  _________________ooo__\\_____/_____________________ " << endl
 		<< " /                                                  \\ " << endl
 		<< " |  Good bye & and thank you for using ContractMe!   | " << endl
@@ -133,6 +136,7 @@ void printBye()
 
 void mainmenu()
 {
+	writeHRtoFile(); //writing the HR workers to the users file
 	int choice;
 
 	do {
@@ -157,6 +161,33 @@ void mainmenu()
 	} while (choice != 3);
 }
 
+void writeHRtoFile()
+{
+	ofstream inFile;
+	inFile.open("database.txt");
+	inFile << "yarden ";
+	inFile << "123 ";
+	inFile << "yarden ";
+	inFile << HR_TYPE << endl;
+	inFile << "mayaan ";
+	inFile << "456 ";
+	inFile << "mayaan ";
+	inFile << HR_TYPE << endl;
+	inFile << "david ";
+	inFile << "789 ";
+	inFile << "david ";
+	inFile << HR_TYPE << endl;
+	inFile << "benny ";
+	inFile << "159 ";
+	inFile << "benny ";
+	inFile << HR_TYPE << endl;
+	inFile << "michael ";
+	inFile << "357 ";
+	inFile << "michael ";
+	inFile << HR_TYPE << endl;
+	inFile.close();
+}
+
 void login()
 {
 	char userInput[N];
@@ -177,11 +208,13 @@ void login()
 	//char* checkuser = new char[strlen(user) + 1];
 	int checkpass;
 	int checktype;
+	char temp[N];
 	if (checkUserExists(inFile, userInput)) {
 		inFile >> checkpass;
 		if (checkpass == pass)
 		{
 			cout << "\n";
+			inFile >> temp; // skipping the name 
 			inFile >> checktype;
 			inFile.close();
 			ChooseMenu(checktype, userInput);
@@ -282,7 +315,7 @@ void tech()
 	// inFile << problem << //   bad loop
 
 	inFile.close();
-	
+
 }
 
 void contractorMenu(char *userInput)
@@ -311,7 +344,7 @@ void contractorMenu(char *userInput)
 			break;
 		}
 	}
-	
+
 	inFile.close();
 
 	cout << "You worked " << workHours << " hours this month, and your salary is: " << (workHours * payPerHour) << endl;
@@ -462,6 +495,7 @@ void addNewWorker() {
 		cout << "error opening file" << endl;
 		exit(1);
 	}
+	lowercase(username);
 	inFile << username << " ";
 	inFile << password << " ";
 	inFile << fullName << " ";
@@ -509,16 +543,17 @@ void workersFeed() {
 	cout << "Hello, Please enter the username" << endl;
 	cin >> userName;
 	if (checkUserExists(inFile, userName)) {
+		cout << "contracrot details: " << endl;
 		inFile >> temp; // skipping password field.
 		inFile >> temp; // reading fullname field.
-		cout << temp;
+		cout << temp << endl;
 		inFile >> temp; // skipping user Type.
 		inFile >> temp; // reading wage field.
-		cout << temp;
+		cout << temp << endl;
 		inFile >> temp; // reading skills field.
-		cout << temp;
+		cout << temp << endl;
 		inFile >> temp; // reading place field.
-		cout << temp;
+		cout << temp << endl;
 		inFile.close();
 		inFile.open("workHistory.txt");
 		while (!inFile.eof()) {
@@ -528,7 +563,7 @@ void workersFeed() {
 				while (temp != "UserName:") {
 					inFile >> temp;
 					cout << temp;
-					// cout << endl;
+					cout << endl;
 				}
 			}
 		}
@@ -600,6 +635,34 @@ void searchContractor(char* currentUser) {
 	cin >> maxWage;
 	cout << "Enter date ( 0 if not needed)" << endl;
 	date = calendar(currentUser);
+	//fstream inFile;
+	//inFile.open("database.txt");
+	//int checkType;
+	//Contractor user;
+	//while(inFile.eof()){
+	//	inFile >> checkType;//קולט את סוג המשתמש בהנחה שהוא הנתון הראשון
+	//	if (checkType == 3)//רק אם הסוג הוא 3 קולט את כל הנתונים
+	//	{
+	//		inFile >> user.details.username;
+	//		inFile >> user.details.password;
+	//		inFile >> user.details.fullName;
+	//		inFile >> user.salary;
+	//		inFile >> user.interes;
+	//		inFile >> user.place;
+	//		if (user.place == location || location == 0)//
+	//		{
+	//			if (user.interes == skills || skills == 0)
+	//			{
+	//				if ((user.salary > minWage && user.salary < maxWage) || minWage == 0 || maxWage == 0)
+	//				{
+	//					if (!chackDate(date))//שליחה להאם התאריך נמצא ברשימת תאריכי עבודה של הקבלן
+	//						printContracror(user);//שליחה להדפסת קבלן
+	//				}
+	//			}
+	//		}
+	//	}
+
+	//}
 }
 
 string calendar(char* currentUser) {
