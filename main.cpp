@@ -1,9 +1,9 @@
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
-#include <windows.h> 
-#include <conio.h>
-#include <dos.h>
+// #include <windows.h> 
+// #include <conio.h>
+// #include <dos.h>
 #include <fstream>
 #include <cstdlib>
 #include <string>
@@ -104,27 +104,27 @@ int main()
 	return 0;
 }
 
-void textColor(int textcolor)  // function to switch text colors
-{
-	HANDLE  hConsole;
-	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleTextAttribute(hConsole, textcolor);
-}
+// void textColor(int textcolor)  // function to switch text colors
+// {
+// 	HANDLE  hConsole;
+// 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+// 	SetConsoleTextAttribute(hConsole, textcolor);
+// }
 
-void ourLogo() // func to print our logo
-{
-	textColor(48);
-	cout << "                                                                                  " << endl;
-	textColor(48); cout << "  "; textColor(1); cout << " CCCCCCC                                                   M     M            "; textColor(48); cout << "  " << endl;
-	textColor(48); cout << "  "; textColor(1); cout << " CCC           n      t                         t         MMM   MMM     eeeee "; textColor(48); cout << "  " << endl;
-	textColor(48); cout << "  "; textColor(1); cout << " CC       ooo  nnnn  ttt   r rrrr aaaaa  ccccc ttt       M   M M   M    e     "; textColor(48); cout << "  " << endl;
-	textColor(48); cout << "  "; textColor(1); cout << " CC      o   o n   n  t     r     a   a  c      t       M     M     M   eeee  "; textColor(48); cout << "  " << endl;
-	textColor(48); cout << "  "; textColor(1); cout << " CCC     o   o n   n  t     r     a   a  c      t      M             M  e     "; textColor(48); cout << "  " << endl;
-	textColor(48); cout << "  "; textColor(1); cout << " CCCCCCC  ooo  n   n  tttt  r     aaaaaa ccccc  tttt  M               M eeeee "; textColor(48); cout << "  " << endl;
-	textColor(48);
-	cout << "                                                                                  " << endl;
-	textColor(15); // returning to white text
-}
+// void ourLogo() // func to print our logo
+// {
+// 	textColor(48);
+// 	cout << "                                                                                  " << endl;
+// 	textColor(48); cout << "  "; textColor(1); cout << " CCCCCCC                                                   M     M            "; textColor(48); cout << "  " << endl;
+// 	textColor(48); cout << "  "; textColor(1); cout << " CCC           n      t                         t         MMM   MMM     eeeee "; textColor(48); cout << "  " << endl;
+// 	textColor(48); cout << "  "; textColor(1); cout << " CC       ooo  nnnn  ttt   r rrrr aaaaa  ccccc ttt       M   M M   M    e     "; textColor(48); cout << "  " << endl;
+// 	textColor(48); cout << "  "; textColor(1); cout << " CC      o   o n   n  t     r     a   a  c      t       M     M     M   eeee  "; textColor(48); cout << "  " << endl;
+// 	textColor(48); cout << "  "; textColor(1); cout << " CCC     o   o n   n  t     r     a   a  c      t      M             M  e     "; textColor(48); cout << "  " << endl;
+// 	textColor(48); cout << "  "; textColor(1); cout << " CCCCCCC  ooo  n   n  tttt  r     aaaaaa ccccc  tttt  M               M eeeee "; textColor(48); cout << "  " << endl;
+// 	textColor(48);
+// 	cout << "                                                                                  " << endl;
+// 	textColor(15); // returning to white text
+// }
 
 void printBye()
 {
@@ -584,7 +584,7 @@ bool checkUserExists(ifstream& inFile, char* userInput)
 
 void statisticAnalysis() {
 	cout << "Hello," << endl
-		<< "Company’s Statistic Analysis  " << endl;
+		<< "Companyï¿½s Statistic Analysis  " << endl;
 	cout << "Contractor numbers: " << ContractorCount << endl
 		<< "Contractor Hired: " << ContractorHired << endl
 		<< "Employer Numbers: " << EmployerCount << endl;
@@ -967,7 +967,7 @@ void bookContractor(const char* username, char* currentUser, WorkDay date)
 			if (strcmp(temp, currentUser))
 			{
 				File >> temp;//skipping the "HiringHistory"
-				//ìäåñéó ùëø åéëåìåú
+				//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 				File << date.day;
 				File << date.month;
 				File << date.year;
