@@ -45,7 +45,7 @@ typedef struct Contractor {
 	char place[N];
 	int numskills;
 	string* skill = NULL;
-	int numOfWorkDays;
+	int numOfWorkDays = 0;
 	WorkDay* workDay;
 }Contractor;
 
@@ -687,6 +687,7 @@ void addNewWorker() {
 		delete[] skills[i];
 	delete skills;*/
 	inFile.close();
+	++ContractorCount;
 }
 
 void monitorHiring() {
@@ -821,6 +822,7 @@ void searchContractor(char* currentUser) {
 	char userUsername[N];
 	int userSalary;
 	char userPlace[N];
+	int flag = 0;
 	cout << "searching workers for:" << skill << "/t";
 	cout << date.day << "/" << date.month << "/" << date.year << endl;
 	while (!inFile.eof()) {
@@ -850,7 +852,7 @@ void searchContractor(char* currentUser) {
 				strcpy(userSkills[i], temp);
 			}
 			inFile >> userPlace;
-			if (userPlace == location || location == 0)
+			if (strcmp(userPlace, location) == 0 || location == 0)
 			{
 				if (checkSkills(userSkills, userNumSkills, skill) || skill == 0)
 				{
@@ -858,6 +860,7 @@ void searchContractor(char* currentUser) {
 					{
 						if (checkDate(date, userUsername))//check if the contractor is available
 						{
+							++flag;
 							cout << UserName << endl;
 							cout << userSalary << endl;
 							for (int i = 0; i < userNumSkills; ++i) {
@@ -872,7 +875,12 @@ void searchContractor(char* currentUser) {
 		}
 
 	}
-
+	if (flag == 0)
+	{
+		cout << "cannot find contractor that fit to your needs" << endl;
+		inFile.close();
+		return;
+	}
 	cout << "please enter the name of the contractor you want to book" << endl;
 	cin >> UserName;
 	bookContractor(UserName, currentUser, date);
@@ -882,7 +890,7 @@ void searchContractor(char* currentUser) {
 bool checkSkills(char** skills, int length, char* skill)
 {
 	for (int i = 0; i < length; ++i)
-		if (skills[i] == skill)
+		if (strcmp(skills[i], skill) == 0)
 			return true;
 	return false;
 }
@@ -923,6 +931,7 @@ bool checkDate(WorkDay date, char* userName)
 
 		}
 	}
+	inFile.close();
 	return false;
 }
 
@@ -935,10 +944,10 @@ void bookContractor(const char* username, char* currentUser, WorkDay date)
 		cout << "error opening file" << endl;
 		exit(1);
 	}
-	while (inFile.eof())
+	while (!inFile.eof())
 	{
 		inFile >> temp;
-		if (temp == "UserName:")
+		if (strcmp(temp ,"UserName:")==0)
 		{
 			inFile >> temp;
 			if (strcmp(username, temp))
@@ -961,7 +970,7 @@ void bookContractor(const char* username, char* currentUser, WorkDay date)
 	while (File.eof())
 	{
 		File >> temp;
-		if (temp == "UserName:")
+		if (strcmp(temp, "UserName:") == 0)
 		{
 			File >> temp;
 			if (strcmp(temp, currentUser))
@@ -976,6 +985,8 @@ void bookContractor(const char* username, char* currentUser, WorkDay date)
 		}
 	}
 	File.close();
+	++ContractorHired;//increas the number of contractor that hired
+
 
 }
 
