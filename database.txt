@@ -1,10 +1,6 @@
-/* inFile << username << " ";
-	inFile << password << " ";
-	inFile << fullName << " ";
-	inFile << CONTRACTOR_TYPE << " ";
-	inFile << wage << " ";
-	inFile << skills << " ";
-	inFile << place << " ";
-*/
-bennyy 123 Benny 3 7777 cpp ashdod 
-davidd 123 David 1
+yarden 123 yarden 1
+mayaan 456 mayaan 1
+david 789 david 1
+benny 159 benny 1
+michael 357 michael 1
+misha 123123 Misha 3 10 2 c c++ ashk 
