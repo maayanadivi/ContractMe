@@ -89,12 +89,13 @@ bool checkSkills(string*, int, string);
 bool checkUserExists(ifstream&, string);
 bool checkDate(WorkDay, string);
 WorkDay calendar(string);
-
+void readStatistic();
+void updateStatistic();
 
 int main()
 {
 	ourLogo(); // function to print our logo
-
+	readStatistic();
 	textColor(15);
 	cout << endl << endl
 		<< "+++++++++++++++++++++++++++++++++++++++++++" << endl
@@ -102,8 +103,9 @@ int main()
 		<< "+++++++++++++++++++++++++++++++++++++++++++" << endl;
 
 	textColor(15); // changing back to white text
+	
 	mainmenu();
-
+	updateStatistic();
 	printBye();
 	getchar();
 	return 0;
@@ -215,6 +217,7 @@ void login()
 	}
 	cout << "User does not exsist in the database, try again";
 	inFile.close();
+
 	return;
 }
 
@@ -317,7 +320,8 @@ void contractorMenu(string userInput)
 		{
 			if ((worker.workDay[i].startTime != 0 && worker.workDay[i].endTime != 0) && (worker.workDay[i].startTime != -1 && worker.workDay[i].endTime != -1))
 			{
-				cout << worker.workDay[i].day << "/" << worker.workDay[i].month << "/" << worker.workDay[i].year << "\t" << worker.workDay[i].startTime << ":00 - " << worker.workDay[i].endTime << ":00" << endl;
+				cout << worker.workDay[i].day << "/" << worker.workDay[i].month << "/" << worker.workDay[i].year << "\t" << worker.workDay[i].startTime << ":00 - " << worker.workDay[i].endTime << ":00" 
+					 << "\t" <<"$" << worker.workDay[i].wage << endl;
 				totalSalary += calculateHours(worker.workDay[i].startTime, worker.workDay[i].endTime, worker.workDay[i].wage);
 			}
 		}
@@ -335,11 +339,9 @@ void contractorMenu(string userInput)
 			break;
 		case 1: //report work hours
 			addworkday(worker);
-			updateWorkHistory(worker);
 			break;
 		case 2: //Report vacation
 			addvacation(worker);
-			updateWorkHistory(worker);
 			break;
 		case 3:
 			// edit
@@ -416,9 +418,9 @@ void buildContractor(Contractor& worker, string userInput)
 void addworkday(Contractor& worker)
 {
 	WorkDay date = calendar(worker.details.username);
-	cout << "Enter the hour u Started to work: " << endl;
+	cout << "Enter work start hour " << endl;
 	cin >> date.startTime;
-	cout << "Enter the hour u Finished to work: " << endl;
+	cout << "Enter work end hour " << endl;
 	cin >> date.endTime;
 	for (int i = 0; i < worker.numOfWorkDays; ++i)
 	{
@@ -450,6 +452,7 @@ void addworkday(Contractor& worker)
 	}
 	delete[] worker.workDay;
 	worker.workDay = temp;
+	updateWorkHistory(worker);
 }
 
 void addvacation(Contractor& worker)
@@ -502,6 +505,7 @@ void addvacation(Contractor& worker)
 		worker.workDay = temp;
 		startVacation.day++;
 	}
+	updateWorkHistory(worker);
 }
 
 void updateWorkHistory(Contractor& worker)
@@ -509,6 +513,10 @@ void updateWorkHistory(Contractor& worker)
 	string checkInput;
 	ifstream original;
 	original.open("workHistory.txt");
+	if (original.fail()) {
+		cerr << "error opening file" << endl;
+		exit(1);
+	}
 	ofstream replica;
 	replica.open("workHistory2.txt");
 	while (!original.eof())
@@ -815,7 +823,8 @@ void workersFeed()
 		for (int i = 0; i < user.numOfWorkDays; ++i)
 		{
 			if ((user.workDay[i].startTime != 0 && user.workDay[i].endTime != 0) && (user.workDay[i].startTime != -1 && user.workDay[i].endTime != -1))
-				cout << "\t" << user.workDay[i].day << "/" << user.workDay[i].month << "/" << user.workDay[i].year << "\t" << user.workDay[i].startTime << ":00 - " << user.workDay[i].endTime << ":00" << endl;
+				cout << "\t" << user.workDay[i].day << "/" << user.workDay[i].month << "/" << user.workDay[i].year << "\t" << user.workDay[i].startTime << ":00 - " << user.workDay[i].endTime << ":00" 
+				<< "\t $" << user.workDay[i].wage << " for hour" << endl;
 			else if (user.workDay[i].startTime == 0 && user.workDay[i].endTime == 0)
 				cout << "\t" << user.workDay[i].day << "/" << user.workDay[i].month << "/" << user.workDay[i].year << " - Vacation" << endl;
 		}
@@ -824,33 +833,13 @@ void workersFeed()
 		cin >> choise;
 		if (choise == '1')
 		{
-			
+			addworkday(user);
 		}
 		
 	}
 	else cout << "User does not exist. Return to menu - press Enter" << endl;
 	getchar();
 	inFile.close();
-}
-
-void editWorkday(Contractor& worker)
-{
-	WorkDay date = calendar(worker.details.username);
-	cout << "Enter the hour u Started to work: " << endl;
-	cin >> date.startTime;
-	cout << "Enter the hour u Finished to work: " << endl;
-	cin >> date.endTime;
-	for (int i = 0; i < worker.numOfWorkDays; ++i)
-	{
-		if (date.day == worker.workDay[i].day)
-			if (date.month == worker.workDay[i].month)
-				if (date.year == worker.workDay[i].year)
-				{
-					worker.workDay[i].startTime = date.startTime;
-					worker.workDay[i].endTime = date.endTime;
-					return;
-				}
-	}
 }
 
 void employeerMenu(string userInput)
@@ -1126,8 +1115,7 @@ void printDetails(string username)
 
 void lowercase(string& data)
 {
-	transform(data.begin(), data.end(), data.begin(),
-		[](unsigned char c) { return tolower(c); });
+	transform(data.begin(), data.end(), data.begin(), ::tolower);
 }
 
 bool checkSkills(string* skills, int length, string skill)
@@ -1245,3 +1233,42 @@ WorkDay calendar(string currentUser) {
 	return temp;
 }
 
+void readStatistic() {
+	ifstream inFile;
+	inFile.open("database.txt");
+	if (inFile.fail()) {
+		cerr << "error opening file" << endl;
+		exit(1);
+	}
+	inFile >> ContractorCount;
+	inFile >> ContractorHired;
+	inFile >> EmployerCount;
+	inFile.close();
+}
+
+void updateStatistic() {
+	ifstream originalDatabase;
+	originalDatabase.open("database.txt");
+	if (originalDatabase.fail()) {
+		cerr << "error opening file" << endl;
+		exit(1);
+	}
+	ofstream replicaDatabase;
+	replicaDatabase.open("database2.txt");
+	replicaDatabase << ContractorCount << " " 
+		   << ContractorHired << " "
+		   << EmployerCount << endl;
+	string temp;
+	getline(originalDatabase, temp); // Ignoring the first line where the statistic appears.
+	while (!originalDatabase.eof())
+	{
+		getline(originalDatabase, temp);
+		replicaDatabase << temp;
+		if (!originalDatabase.eof())
+			replicaDatabase << endl;
+	}
+	originalDatabase.close();
+	replicaDatabase.close();
+	remove("database.txt");
+	rename("database2.txt", "database.txt");
+}
