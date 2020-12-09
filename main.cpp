@@ -49,41 +49,46 @@ typedef struct Contractor {
 }Contractor;
 
 
-void textColor(int textcolor);
+void textColor(int);
 void ourLogo();
 void printBye();
 void mainmenu();
-WorkDay calendar(string);
-void writeHRtoFile();
 void login();
 void signUp();
 void writeUserToFile(User);
-void tech();
-bool checkUserExists(ifstream&, string);
+
 void ChooseMenu(int, string);
-void lowercase(string&);
+
+void tech();
+
+void contractorMenu(string);
+void buildContractor(Contractor&, string);
+void addworkday(Contractor&);
+void addvacation(Contractor&);
+void updateWorkHistory(Contractor&);
+void editprofile(Contractor&);
 int calculateHours(int, int, int);
 
 void hrMenu(string);
 void statisticAnalysis();
-void addNewWorker();
 void monitorHiring();
+void addNewWorker();
 void workersFeed();
+void editWorkday(Contractor&);
 
 void employeerMenu(string);
 void hiringHistory(string);
 void searchContractor(string);
-bool checkSkills(string*, int, string);
 void bookContractor(string, string, WorkDay);
-bool checkDate(WorkDay, string);
+void printDetails(string);
 
-void contractorMenu(string);
-void editprofile(Contractor&);
-void addworkday(Contractor&);
-void updateWorkHistory(Contractor&);
-void addvacation(Contractor&);
-void buildContractor(Contractor&, string);
-void printDetails(string username);
+
+//Helper Functions
+void lowercase(string&);
+bool checkSkills(string*, int, string);
+bool checkUserExists(ifstream&, string);
+bool checkDate(WorkDay, string);
+WorkDay calendar(string);
 
 
 int main()
@@ -294,6 +299,63 @@ void tech()
 
 }
 
+void contractorMenu(string userInput)
+{
+	//// name username password type workHours payPerHour NotAvailable(DayOfMonth)
+		// welcome to the contractor menu, and print his work hours and salary
+	Contractor worker;
+	buildContractor(worker, userInput);
+	int totalSalary = 0;
+	// entering to the contractor menu options
+	int choice = 0;
+	while (choice != 4)
+	{
+		ourLogo();
+		totalSalary = 0;
+		cout << "Hello " << worker.details.fullName << endl;
+		for (int i = 0; i < worker.numOfWorkDays; i++)
+		{
+			if ((worker.workDay[i].startTime != 0 && worker.workDay[i].endTime != 0) && (worker.workDay[i].startTime != -1 && worker.workDay[i].endTime != -1))
+			{
+				cout << worker.workDay[i].day << "/" << worker.workDay[i].month << "/" << worker.workDay[i].year << "\t" << worker.workDay[i].startTime << ":00 - " << worker.workDay[i].endTime << ":00" << endl;
+				totalSalary += calculateHours(worker.workDay[i].startTime, worker.workDay[i].endTime, worker.workDay[i].wage);
+			}
+		}
+		cout << "And your total salary is:" << totalSalary << endl;
+		cout << "Welcome to the Contractor Menu" << endl;
+		cout << "\nWhat do you want to do next? " << endl
+			<< "1.Report work hours" << endl
+			<< "2.Report vacation" << endl
+			<< "3.Edit profile" << endl
+			<< "4.Sign out" << endl;
+		cin >> choice;
+		switch (choice) {
+		case 0: // technical support
+			tech();
+			break;
+		case 1: //report work hours
+			addworkday(worker);
+			updateWorkHistory(worker);
+			break;
+		case 2: //Report vacation
+			addvacation(worker);
+			updateWorkHistory(worker);
+			break;
+		case 3:
+			// edit
+			editprofile(worker);
+			break;
+		case 4:
+			delete[] worker.skill;
+			delete[]worker.workDay;
+			cout << "Signed out of the system." << endl;
+			break;
+		default:
+			cout << "Please enter choice between 1-4 only, 4 to sign out." << endl;
+		}
+	}
+}
+
 void buildContractor(Contractor& worker, string userInput)
 {
 	fstream inFile; //getting workHours and payPerHour from the database
@@ -351,61 +413,140 @@ void buildContractor(Contractor& worker, string userInput)
 	inFile.close();
 }
 
-void contractorMenu(string userInput)
+void addworkday(Contractor& worker)
 {
-	//// name username password type workHours payPerHour NotAvailable(DayOfMonth)
-		// welcome to the contractor menu, and print his work hours and salary
-	Contractor worker;
-	buildContractor(worker, userInput);
-	int totalSalary = 0;
-	// entering to the contractor menu options
-	int choice = 0;
-	while (choice != 4)
+	WorkDay date = calendar(worker.details.username);
+	cout << "Enter the hour u Started to work: " << endl;
+	cin >> date.startTime;
+	cout << "Enter the hour u Finished to work: " << endl;
+	cin >> date.endTime;
+	for (int i = 0; i < worker.numOfWorkDays; ++i)
 	{
-		ourLogo();
-		totalSalary = 0;
-		cout << "Hello " << worker.details.fullName << endl;
-		for (int i = 0; i < worker.numOfWorkDays; i++)
+		if (date.day == worker.workDay[i].day)
+			if (date.month == worker.workDay[i].month)
+				if (date.year == worker.workDay[i].year)
+				{
+					worker.workDay[i].startTime = date.startTime;
+					worker.workDay[i].endTime = date.endTime;
+					return;
+				}
+	}
+	worker.numOfWorkDays++;
+	WorkDay* temp = new WorkDay[worker.numOfWorkDays];
+	temp[0].day = date.day;
+	temp[0].month = date.month;
+	temp[0].year = date.year;
+	temp[0].startTime = date.startTime;
+	temp[0].endTime = date.endTime;
+	temp[0].wage = worker.salary;
+	for (int i = 1; i < worker.numOfWorkDays; ++i)
+	{
+		temp[i].day = worker.workDay[i - 1].day;
+		temp[i].month = worker.workDay[i - 1].month;
+		temp[i].year = worker.workDay[i - 1].year;
+		temp[i].startTime = worker.workDay[i - 1].startTime;
+		temp[i].endTime = worker.workDay[i - 1].endTime;
+		temp[i].wage = worker.workDay[i - 1].wage;
+	}
+	delete[] worker.workDay;
+	worker.workDay = temp;
+}
+
+void addvacation(Contractor& worker)
+{
+	int starthour = 0, endhour = 0;
+	cout << "enter the date you start the vacation" << endl;
+	WorkDay startVacation = calendar(worker.details.username);
+	cout << "enter the date you end the vacation" << endl;
+	WorkDay endVacation = calendar(worker.details.username);
+	for (int i = 0; i < worker.numOfWorkDays; ++i)
+	{
+		if (startVacation.year <= worker.workDay[i].year && endVacation.year >= worker.workDay[i].year)
+			if (startVacation.month <= worker.workDay[i].month && endVacation.month >= worker.workDay[i].month)
+				if (startVacation.day <= worker.workDay[i].day && endVacation.day >= worker.workDay[i].day)
+				{
+					cout << "You can't report a vacation on this day, you already reported a workday on this day" << endl;
+					return;
+				}
+	}
+	while (!(startVacation.day == endVacation.day + 1 && startVacation.month == endVacation.month && startVacation.year == endVacation.year))
+	{
+		if (startVacation.day == 32)
 		{
-			if ((worker.workDay[i].startTime != 0 && worker.workDay[i].endTime != 0) && (worker.workDay[i].startTime != -1 && worker.workDay[i].endTime != -1))
+			startVacation.day = 1;
+			startVacation.month++;
+			if (startVacation.month == 13)
 			{
-				cout << worker.workDay[i].day << "/" << worker.workDay[i].month << "/" << worker.workDay[i].year << "\t" << worker.workDay[i].startTime << ":00 - " << worker.workDay[i].endTime << ":00" << endl;
-				totalSalary += calculateHours(worker.workDay[i].startTime, worker.workDay[i].endTime, worker.workDay[i].wage);
+				startVacation.month = 1;
+				startVacation.year++;
 			}
 		}
-		cout << "And your total salary is:" << totalSalary << endl;
-		cout << "Welcome to the Contractor Menu" << endl;
-		cout << "\nWhat do you want to do next? " << endl
-			<< "1.Report work hours" << endl
-			<< "2.Report vacation" << endl
-			<< "3.Edit profile" << endl
-			<< "4.Sign out" << endl;
-		cin >> choice;
-		switch (choice) {
-		case 0: // technical support
-			tech();
-			break;
-		case 1: //report work hours
-			addworkday(worker);
-			updateWorkHistory(worker);
-			break;
-		case 2: //Report vacation
-			addvacation(worker);
-			updateWorkHistory(worker);
-			break;
-		case 3:
-			// edit
-			editprofile(worker);
-			break;
-		case 4:
-			delete[] worker.skill;
-			delete[]worker.workDay;
-			cout << "Signed out of the system." << endl;
-			break;
-		default:
-			cout << "Please enter choice between 1-4 only, 4 to sign out." << endl;
+		worker.numOfWorkDays++;
+		WorkDay* temp = new WorkDay[worker.numOfWorkDays];
+		temp[0].day = startVacation.day;
+		temp[0].month = startVacation.month;
+		temp[0].year = startVacation.year;
+		temp[0].startTime = starthour;
+		temp[0].endTime = endhour;
+		temp[0].wage = worker.salary;
+		for (int i = 1; i < worker.numOfWorkDays; ++i)
+		{
+			temp[i].day = worker.workDay[i - 1].day;
+			temp[i].month = worker.workDay[i - 1].month;
+			temp[i].year = worker.workDay[i - 1].year;
+			temp[i].startTime = worker.workDay[i - 1].startTime;
+			temp[i].endTime = worker.workDay[i - 1].endTime;
+			temp[i].wage = worker.workDay[i - 1].wage;
 		}
+		delete[] worker.workDay;
+		worker.workDay = temp;
+		startVacation.day++;
 	}
+}
+
+void updateWorkHistory(Contractor& worker)
+{
+	string checkInput;
+	ifstream original;
+	original.open("workHistory.txt");
+	ofstream replica;
+	replica.open("workHistory2.txt");
+	while (!original.eof())
+	{
+		getline(original, checkInput);
+		if (checkInput == worker.details.username)
+			break;
+		replica << checkInput << endl;
+	}
+	string temp;
+	int num;
+	original >> num;
+	for (int i = 0; i < num + 1; ++i)
+	{
+		getline(original, temp);
+	}
+	while (!original.eof())
+	{
+		getline(original, temp);
+		replica << temp;
+		if (!original.eof())
+			replica << endl;
+	}
+	replica << worker.details.username << endl;
+	replica << worker.numOfWorkDays << endl;
+	for (int i = 0; i < worker.numOfWorkDays; ++i)
+	{
+		replica << worker.workDay[i].day << " ";
+		replica << worker.workDay[i].month << " ";
+		replica << worker.workDay[i].year << " ";
+		replica << worker.workDay[i].startTime << " ";
+		replica << worker.workDay[i].endTime<<" ";
+		replica << worker.workDay[i].wage << endl;
+	}
+	original.close();
+	replica.close();
+	remove("workHistory.txt");
+	rename("workHistory2.txt", "workHistory.txt");
 }
 
 void editprofile(Contractor& worker)
@@ -488,180 +629,12 @@ void editprofile(Contractor& worker)
 	inFile.close();
 }
 
-void addvacation(Contractor& worker)
-{
-	int starthour = 0, endhour = 0;
-	cout << "enter the date you start the vacation" << endl;
-	WorkDay startVacation = calendar(worker.details.username);
-	cout << "enter the date you end the vacation" << endl;
-	WorkDay endVacation = calendar(worker.details.username);
-	for (int i = 0; i < worker.numOfWorkDays; ++i)
-	{
-		if (startVacation.year <= worker.workDay[i].year && endVacation.year >= worker.workDay[i].year)
-			if (startVacation.month <= worker.workDay[i].month && endVacation.month >= worker.workDay[i].month)
-				if (startVacation.day <= worker.workDay[i].day && endVacation.day >= worker.workDay[i].day)
-				{
-					cout << "You can't report a vacation on this day, you already reported a workday on this day" << endl;
-					return;
-				}
-	}
-	while (!(startVacation.day == endVacation.day + 1 && startVacation.month == endVacation.month && startVacation.year == endVacation.year))
-	{
-		if (startVacation.day == 32)
-		{
-			startVacation.day = 1;
-			startVacation.month++;
-			if (startVacation.month == 13)
-			{
-				startVacation.month = 1;
-				startVacation.year++;
-			}
-		}
-		worker.numOfWorkDays++;
-		WorkDay* temp = new WorkDay[worker.numOfWorkDays];
-		temp[0].day = startVacation.day;
-		temp[0].month = startVacation.month;
-		temp[0].year = startVacation.year;
-		temp[0].startTime = starthour;
-		temp[0].endTime = endhour;
-		temp[0].wage = worker.salary;
-		for (int i = 1; i < worker.numOfWorkDays; ++i)
-		{
-			temp[i].day = worker.workDay[i - 1].day;
-			temp[i].month = worker.workDay[i - 1].month;
-			temp[i].year = worker.workDay[i - 1].year;
-			temp[i].startTime = worker.workDay[i - 1].startTime;
-			temp[i].endTime = worker.workDay[i - 1].endTime;
-			temp[i].wage = worker.workDay[i - 1].wage;
-		}
-		delete[] worker.workDay;
-		worker.workDay = temp;
-		startVacation.day++;
-	}
-}
-
-void addworkday(Contractor& worker)
-{
-	WorkDay date = calendar(worker.details.username);
-	cout << "Enter the hour u Started to work: " << endl;
-	cin >> date.startTime;
-	cout << "Enter the hour u Finished to work: " << endl;
-	cin >> date.endTime;
-	for (int i = 0; i < worker.numOfWorkDays; ++i)
-	{
-		if (date.day == worker.workDay[i].day)
-			if (date.month == worker.workDay[i].month)
-				if (date.year == worker.workDay[i].year)
-				{
-					worker.workDay[i].startTime = date.startTime;
-					worker.workDay[i].endTime = date.endTime;
-					return;
-				}
-	}
-	worker.numOfWorkDays++;
-	WorkDay* temp = new WorkDay[worker.numOfWorkDays];
-	temp[0].day = date.day;
-	temp[0].month = date.month;
-	temp[0].year = date.year;
-	temp[0].startTime = date.startTime;
-	temp[0].endTime = date.endTime;
-	temp[0].wage = worker.salary;
-	for (int i = 1; i < worker.numOfWorkDays; ++i)
-	{
-		temp[i].day = worker.workDay[i - 1].day;
-		temp[i].month = worker.workDay[i - 1].month;
-		temp[i].year = worker.workDay[i - 1].year;
-		temp[i].startTime = worker.workDay[i - 1].startTime;
-		temp[i].endTime = worker.workDay[i - 1].endTime;
-		temp[i].wage = worker.workDay[i - 1].wage;
-	}
-	delete[] worker.workDay;
-	worker.workDay = temp;
-}
-
-void updateWorkHistory(Contractor& worker)
-{
-	string checkInput;
-	ifstream original;
-	original.open("workHistory.txt");
-	ofstream replica;
-	replica.open("workHistory2.txt");
-	while (!original.eof())
-	{
-		getline(original, checkInput);
-		if (checkInput == worker.details.username)
-			break;
-		replica << checkInput << endl;
-	}
-	string temp;
-	int num;
-	original >> num;
-	for (int i = 0; i < num + 1; ++i)
-	{
-		getline(original, temp);
-	}
-	while (!original.eof())
-	{
-		getline(original, temp);
-		replica << temp;
-		if (!original.eof())
-			replica << endl;
-	}
-	replica << worker.details.username << endl;
-	replica << worker.numOfWorkDays << endl;
-	for (int i = 0; i < worker.numOfWorkDays; ++i)
-	{
-		replica << worker.workDay[i].day << " ";
-		replica << worker.workDay[i].month << " ";
-		replica << worker.workDay[i].year << " ";
-		replica << worker.workDay[i].startTime << " ";
-		replica << worker.workDay[i].endTime<<" ";
-		replica << worker.workDay[i].wage << endl;
-	}
-	original.close();
-	replica.close();
-	remove("workHistory.txt");
-	rename("workHistory2.txt", "workHistory.txt");
-}
-
 int calculateHours(int start, int finish, int wage) // example:: start = 8, finish = 17 ... => = 9 hours
 {
 	int hours = 0;
 	for (int i = start; i < finish; i++)
 		hours++;
 	return hours*wage;
-}
-
-void lowercase(string& data)
-{
-	transform(data.begin(), data.end(), data.begin(),
-		[](unsigned char c) { return tolower(c); });
-}
-
-bool checkUserExists(ifstream& inFile, string userName)
-{
-	inFile.seekg(0, ios::beg);
-	string checkUser;
-	string skipLine;
-	while (!inFile.eof()) {
-		inFile >> checkUser; // Getting the UserName field from the file.
-		if (checkUser == userName)
-			return true;
-		getline(inFile, skipLine); // Skiping line
-	}
-	return false; // If no matching user was found.
-}
-
-void statisticAnalysis()
-{
-	ourLogo();
-	cout << "Company’s Statistic Analysis:" << endl;
-	cout << "Contractor numbers: " << ContractorCount << endl;
-	cout << "Contractor Hired: " << ContractorHired << endl;
-	cout << "Employer Numbers: " << EmployerCount << endl;
-	cout << "Return to menu - press Enter";
-	getchar();
-	getchar();
 }
 
 void hrMenu(string userInput)
@@ -700,6 +673,39 @@ void hrMenu(string userInput)
 			cout << "Please enter choice between 1-5 only, 5 to sign out." << endl;
 		}
 	}
+}
+
+void statisticAnalysis()
+{
+	ourLogo();
+	cout << "Companyï¿½s Statistic Analysis:" << endl;
+	cout << "Contractor numbers: " << ContractorCount << endl;
+	cout << "Contractor Hired: " << ContractorHired << endl;
+	cout << "Employer Numbers: " << EmployerCount << endl;
+	cout << "Return to menu - press Enter";
+	getchar();
+	getchar();
+}
+
+void monitorHiring()
+{
+	ourLogo();
+	fstream inFile;
+	inFile.open("HiringHistory.txt");
+	if (inFile.fail()) {
+		cout << "error opening file" << endl;
+		exit(1);
+	}
+	string getLine;
+	while (!inFile.eof()) {
+		getline(inFile, getLine); // Skiping line
+		cout << getLine << endl;
+		//cout << endl;
+	}
+	cout << "Return to menu - press Enter";
+	getchar();
+	getchar();
+	inFile.close();
 }
 
 void addNewWorker()
@@ -776,27 +782,6 @@ void addNewWorker()
 	getchar();
 	getchar();
 	++ContractorCount;
-}
-
-void monitorHiring()
-{
-	ourLogo();
-	fstream inFile;
-	inFile.open("HiringHistory.txt");
-	if (inFile.fail()) {
-		cout << "error opening file" << endl;
-		exit(1);
-	}
-	string getLine;
-	while (!inFile.eof()) {
-		getline(inFile, getLine); // Skiping line
-		cout << getLine << endl;
-		//cout << endl;
-	}
-	cout << "Return to menu - press Enter";
-	getchar();
-	getchar();
-	inFile.close();
 }
 
 void workersFeed()
@@ -946,57 +931,6 @@ void hiringHistory(string currentUser)
 	getchar();
 }
 
-void printDetails(string username)
-{
-	int checkType;
-	string UserName;
-	int userPass, userNumSkills;
-	string userUsername;
-	int userSalary;
-	string userPlace;
-	string* userSkills = NULL;
-	int count = 0;
-	fstream inFile;
-	inFile.open("database.txt");
-	if (inFile.fail()) {
-		cout << "error opening file" << endl;
-		exit(1);
-	}
-	while (!inFile.eof()) {
-		inFile >> userUsername;
-		inFile >> userPass;
-		inFile >> UserName;
-		inFile >> checkType;
-		if (checkType == CONTRACTOR_TYPE)//if the user is contractor 
-		{
-			inFile >> userSalary;
-			inFile >> userNumSkills;
-			userSkills = new string[userNumSkills];
-			if (userSkills == NULL)
-			{
-				cout << "cannot allocate memory" << endl;
-				return;
-			}
-			for (int i = 0; i < userNumSkills; ++i) {
-
-				inFile >> userSkills[i];
-			}
-			inFile >> userPlace;
-			if (username == userUsername)
-			{
-				cout << userSalary << "$  ";
-				for (int i = 0; i < userNumSkills; ++i)
-					cout << userSkills[i] << " ";
-				cout << " ";
-			}
-		}
-
-	}
-	if (userSkills != NULL)
-		delete[] userSkills;
-	inFile.close();
-}
-
 void searchContractor(string currentUser)
 {
 	ourLogo();
@@ -1081,54 +1015,6 @@ void searchContractor(string currentUser)
 	inFile.close();
 }
 
-bool checkSkills(string* skills, int length, string skill)
-{
-	for (int i = 0; i < length; ++i)
-		if (skills[i] == skill)
-			return true;
-	return false;
-}
-
-bool checkDate(WorkDay date, string userName)
-{
-	string tempUser;
-	WorkDay temp; //temp date
-	fstream inFile;
-	inFile.open("workHistory.txt");
-	if (inFile.fail()) {
-		cout << "error opening file" << endl;
-		exit(1);
-	}
-	while (!inFile.eof())
-	{
-		inFile >> tempUser;
-		if (tempUser == userName)
-		{
-			int numofdays;
-			inFile >> numofdays;
-			for (int i = 0; i < numofdays; ++i)
-			{
-				inFile >> temp.day;
-				inFile >> temp.month;
-				inFile >> temp.year;
-				inFile >> temp.startTime;
-				inFile >> temp.endTime;
-				if (temp.day == date.day)
-					if (temp.month == date.month)
-						if (temp.year == date.year)
-						{
-							inFile.close();
-							return false;
-						}
-
-			}
-
-		}
-	}
-	inFile.close();
-	return true;
-}
-
 void bookContractor(string username, string currentUser, WorkDay date)
 {
 	Contractor worker;
@@ -1187,6 +1073,125 @@ void bookContractor(string username, string currentUser, WorkDay date)
 	++ContractorHired;//increas the number of contractor that hired
 }
 
+void printDetails(string username)
+{
+	int checkType;
+	string UserName;
+	int userPass, userNumSkills;
+	string userUsername;
+	int userSalary;
+	string userPlace;
+	string* userSkills = NULL;
+	int count = 0;
+	fstream inFile;
+	inFile.open("database.txt");
+	if (inFile.fail()) {
+		cout << "error opening file" << endl;
+		exit(1);
+	}
+	while (!inFile.eof()) {
+		inFile >> userUsername;
+		inFile >> userPass;
+		inFile >> UserName;
+		inFile >> checkType;
+		if (checkType == CONTRACTOR_TYPE)//if the user is contractor 
+		{
+			inFile >> userSalary;
+			inFile >> userNumSkills;
+			userSkills = new string[userNumSkills];
+			if (userSkills == NULL)
+			{
+				cout << "cannot allocate memory" << endl;
+				return;
+			}
+			for (int i = 0; i < userNumSkills; ++i) {
+
+				inFile >> userSkills[i];
+			}
+			inFile >> userPlace;
+			if (username == userUsername)
+			{
+				cout << userSalary << "$  ";
+				for (int i = 0; i < userNumSkills; ++i)
+					cout << userSkills[i] << " ";
+				cout << " ";
+			}
+		}
+
+	}
+	if (userSkills != NULL)
+		delete[] userSkills;
+	inFile.close();
+}
+
+void lowercase(string& data)
+{
+	transform(data.begin(), data.end(), data.begin(),
+		[](unsigned char c) { return tolower(c); });
+}
+
+bool checkSkills(string* skills, int length, string skill)
+{
+	for (int i = 0; i < length; ++i)
+		if (skills[i] == skill)
+			return true;
+	return false;
+}
+
+bool checkUserExists(ifstream& inFile, string userName)
+{
+	inFile.seekg(0, ios::beg);
+	string checkUser;
+	string skipLine;
+	while (!inFile.eof()) {
+		inFile >> checkUser; // Getting the UserName field from the file.
+		if (checkUser == userName)
+			return true;
+		getline(inFile, skipLine); // Skiping line
+	}
+	return false; // If no matching user was found.
+}
+
+bool checkDate(WorkDay date, string userName)
+{
+	string tempUser;
+	WorkDay temp; //temp date
+	fstream inFile;
+	inFile.open("workHistory.txt");
+	if (inFile.fail()) {
+		cout << "error opening file" << endl;
+		exit(1);
+	}
+	while (!inFile.eof())
+	{
+		inFile >> tempUser;
+		if (tempUser == userName)
+		{
+			int numofdays;
+			inFile >> numofdays;
+			for (int i = 0; i < numofdays; ++i)
+			{
+				inFile >> temp.day;
+				inFile >> temp.month;
+				inFile >> temp.year;
+				inFile >> temp.startTime;
+				inFile >> temp.endTime;
+				if (temp.day == date.day)
+					if (temp.month == date.month)
+						if (temp.year == date.year)
+						{
+							inFile.close();
+							return false;
+						}
+
+			}
+
+		}
+	}
+	inFile.close();
+	return true;
+}
+
 WorkDay calendar(string currentUser) {
 	int month, day, year;
 	do {
@@ -1239,3 +1244,4 @@ WorkDay calendar(string currentUser) {
 	temp.year = year;
 	return temp;
 }
+
