@@ -75,6 +75,7 @@ void monitorHiring();
 void addNewWorker();
 void workersFeed();
 void editWorkday(Contractor&);
+void printAllContractorNames();
 
 void employeerMenu(string);
 void hiringHistory(string);
@@ -103,7 +104,7 @@ int main()
 		<< "+++++++++++++++++++++++++++++++++++++++++++" << endl;
 
 	textColor(15); // changing back to white text
-	
+
 	mainmenu();
 	updateStatistic();
 	printBye();
@@ -320,8 +321,8 @@ void contractorMenu(string userInput)
 		{
 			if ((worker.workDay[i].startTime != 0 && worker.workDay[i].endTime != 0) && (worker.workDay[i].startTime != -1 && worker.workDay[i].endTime != -1))
 			{
-				cout << worker.workDay[i].day << "/" << worker.workDay[i].month << "/" << worker.workDay[i].year << "\t" << worker.workDay[i].startTime << ":00 - " << worker.workDay[i].endTime << ":00" 
-					 << "\t" <<"$" << worker.workDay[i].wage << endl;
+				cout << worker.workDay[i].day << "/" << worker.workDay[i].month << "/" << worker.workDay[i].year << "\t" << worker.workDay[i].startTime << ":00 - " << worker.workDay[i].endTime << ":00"
+					<< "\t" << "$" << worker.workDay[i].wage << endl;
 				totalSalary += calculateHours(worker.workDay[i].startTime, worker.workDay[i].endTime, worker.workDay[i].wage);
 			}
 		}
@@ -430,6 +431,7 @@ void addworkday(Contractor& worker)
 				{
 					worker.workDay[i].startTime = date.startTime;
 					worker.workDay[i].endTime = date.endTime;
+					updateWorkHistory(worker);
 					return;
 				}
 	}
@@ -548,7 +550,7 @@ void updateWorkHistory(Contractor& worker)
 		replica << worker.workDay[i].month << " ";
 		replica << worker.workDay[i].year << " ";
 		replica << worker.workDay[i].startTime << " ";
-		replica << worker.workDay[i].endTime<<" ";
+		replica << worker.workDay[i].endTime << " ";
 		replica << worker.workDay[i].wage << endl;
 	}
 	original.close();
@@ -642,7 +644,7 @@ int calculateHours(int start, int finish, int wage) // example:: start = 8, fini
 	int hours = 0;
 	for (int i = start; i < finish; i++)
 		hours++;
-	return hours*wage;
+	return hours * wage;
 }
 
 void hrMenu(string userInput)
@@ -795,8 +797,9 @@ void addNewWorker()
 void workersFeed()
 {
 	ourLogo();
+	printAllContractorNames();
 	ifstream inFile;
-	char choise;
+	char choice;
 	inFile.open("database.txt");
 	if (inFile.fail()) {
 		cout << "error opening file" << endl;
@@ -818,24 +821,25 @@ void workersFeed()
 		{
 			cout << "\t" << i << ": " << user.skill[i - 1] << endl;
 		}
-		cout << "City: " << user.place << endl;
+		cout << "Area: " << user.place << endl;
 		cout << "Workhistory:" << endl;
 		for (int i = 0; i < user.numOfWorkDays; ++i)
 		{
 			if ((user.workDay[i].startTime != 0 && user.workDay[i].endTime != 0) && (user.workDay[i].startTime != -1 && user.workDay[i].endTime != -1))
-				cout << "\t" << user.workDay[i].day << "/" << user.workDay[i].month << "/" << user.workDay[i].year << "\t" << user.workDay[i].startTime << ":00 - " << user.workDay[i].endTime << ":00" 
+				cout << "\t" << user.workDay[i].day << "/" << user.workDay[i].month << "/" << user.workDay[i].year << "\t" << user.workDay[i].startTime << ":00 - " << user.workDay[i].endTime << ":00"
 				<< "\t $" << user.workDay[i].wage << " for hour" << endl;
 			else if (user.workDay[i].startTime == 0 && user.workDay[i].endTime == 0)
 				cout << "\t" << user.workDay[i].day << "/" << user.workDay[i].month << "/" << user.workDay[i].year << " - Vacation" << endl;
 		}
 		inFile.close();
-		cout << "If you want to edit a workday  - press 1" << endl;
-		cin >> choise;
-		if (choise == '1')
+		cout << "If you want to edit a workday  - press 1" << endl << "If you want to exit  - press 0" << endl;;
+		cin >> choice;
+		if (choice == '1')
 		{
 			addworkday(user);
 		}
-		
+		else
+			return;
 	}
 	else cout << "User does not exist. Return to menu - press Enter" << endl;
 	getchar();
@@ -1071,7 +1075,6 @@ void printDetails(string username)
 	int userSalary;
 	string userPlace;
 	string* userSkills = NULL;
-	int count = 0;
 	fstream inFile;
 	inFile.open("database.txt");
 	if (inFile.fail()) {
@@ -1110,6 +1113,34 @@ void printDetails(string username)
 	}
 	if (userSkills != NULL)
 		delete[] userSkills;
+	inFile.close();
+}
+
+void printAllContractorNames()
+{
+	int checkType;
+	string userUsername;
+	string temp;
+	fstream inFile;
+	inFile.open("database.txt");
+	if (inFile.fail()) {
+		cout << "error opening file" << endl;
+		exit(1);
+	}
+	cout << "The contractors names:" << endl;
+	getline(inFile, temp);
+	inFile >> userUsername;
+	while (!inFile.eof()) {
+		inFile >> temp;
+		inFile >> temp;
+		inFile >> checkType;
+		if (checkType == CONTRACTOR_TYPE)//if the user is contractor 
+		{
+			getline(inFile, temp);
+			cout << userUsername << endl;
+		}
+		inFile >> userUsername;
+	}
 	inFile.close();
 }
 
@@ -1255,9 +1286,9 @@ void updateStatistic() {
 	}
 	ofstream replicaDatabase;
 	replicaDatabase.open("database2.txt");
-	replicaDatabase << ContractorCount << " " 
-		   << ContractorHired << " "
-		   << EmployerCount << endl;
+	replicaDatabase << ContractorCount << " "
+		<< ContractorHired << " "
+		<< EmployerCount << endl;
 	string temp;
 	getline(originalDatabase, temp); // Ignoring the first line where the statistic appears.
 	while (!originalDatabase.eof())
