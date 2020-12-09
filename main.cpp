@@ -100,7 +100,6 @@ int main()
 
 	printBye();
 	getchar();
-	getchar();
 	return 0;
 }
 
@@ -178,6 +177,7 @@ void login()
 	string userInput;
 	string pass;
 	cout << endl << endl;
+	cout << "\tlog-in page\t" << endl;
 	cout << "Username: ";
 	cin >> userInput;
 	cout << "Password: ";
@@ -413,9 +413,10 @@ void editprofile(string username)
 	string tmp, checkUser, salary, location, pass, fullname;
 	string* skills = NULL;
 	int numofskills = 0;
+	original >> tmp;
 	do
 	{
-		original >> tmp; //get username
+		//original >> tmp; //get username
 		if (tmp == username)
 		{
 			original >> pass;
@@ -434,6 +435,7 @@ void editprofile(string username)
 			getline(original, tmp);
 			replica << tmp << endl;
 		}
+		original >> tmp;
 	} while (!original.eof());
 	original.close();
 	replica.close();
@@ -1008,7 +1010,7 @@ void searchContractor(string currentUser)
 							cout << "Username: " << userUsername << endl << "Wage: " << userSalary << endl << "Skills: " << endl;
 							for (int i = 0; i < userNumSkills; ++i)
 							{
-								cout << "\t" << userSkills[i] << endl;
+								cout << userSkills[i] << endl;
 							}
 							cout << "===================================================================" << endl;
 						}
