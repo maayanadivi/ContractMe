@@ -7,8 +7,5 @@ Can track the worker work hours and dates to calculate their salaries with more 
 Employeers can find custom workers for their projects.
 
 Made by:
-Maayan Nadivi
-Yarden Hovav
-Benny Shalom
-David Abenhaim
-Mikhail Diyachkov
+![alt text](https://i.imgur.com/4VbTpxm.jpeg)
+![alt text](https://i.imgur.com/7ROAHti.jpeg)
