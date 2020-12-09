@@ -1,4 +1,4 @@
-![alt text](https://imgur.com/a/AuAAwAP)
+![alt text](https://i.imgur.com/bQdwHX2.jpeg)
 # ContractMe
 SCE - ContractME Project - Group 7
 
