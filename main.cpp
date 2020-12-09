@@ -59,29 +59,30 @@ void signUp();
 void writeUserToFile(User);
 void tech();
 bool checkUserExists(ifstream&, string);
-void ChooseMenu(int , string );
+void ChooseMenu(int, string);
 void lowercase(string&);
-int calculateHours(int , int );
+int calculateHours(int, int);
 
-void hrMenu(string );
+void hrMenu(string);
 void statisticAnalysis();
 void addNewWorker();
 void monitorHiring();
 void workersFeed();
 
-void employeerMenu(string );
+void employeerMenu(string);
 void hiringHistory(string);
 void searchContractor(string);
-bool checkSkills(string* , int , string );
-void bookContractor(string , string , WorkDay );
-bool checkDate(WorkDay , string );
+bool checkSkills(string*, int, string);
+void bookContractor(string, string, WorkDay);
+bool checkDate(WorkDay, string);
 
-void contractorMenu(string );
+void contractorMenu(string);
 void editprofile(string);
 void addworkday(Contractor&);
 void updateWorkHistory(Contractor&);
 void addvacation(Contractor&);
 void buildContractor(Contractor&, string);
+void printDetails(string username);
 
 
 int main()
@@ -411,13 +412,13 @@ void editprofile(string username)
 	ofstream replica("database1.txt");
 	string tmp, checkUser, salary, location, pass, fullname;
 	string* skills = NULL;
-	int numofskills=0;
+	int numofskills = 0;
 	do
 	{
 		original >> tmp; //get username
 		if (tmp == username)
 		{
-			original >> pass; 
+			original >> pass;
 			original >> fullname;
 			original >> tmp; //skip type
 			original >> salary;
@@ -473,7 +474,7 @@ void editprofile(string username)
 			inFile << username << " " << pass << " " << fullname << " " << CONTRACTOR_TYPE << " " << salary << " " << numofskills;
 			for (int i = 0; i < numofskills; ++i)
 				inFile << " " << skills[i];
-			inFile << location<< endl;
+			inFile << location << endl;
 			break;
 		default:
 			cout << "Incorrect input" << endl;
@@ -755,7 +756,7 @@ void addNewWorker()
 	++ContractorCount;
 }
 
-void monitorHiring() 
+void monitorHiring()
 {
 	ourLogo();
 	fstream inFile;
@@ -767,7 +768,7 @@ void monitorHiring()
 	string getLine;
 	while (!inFile.eof()) {
 		getline(inFile, getLine); // Skiping line
-		cout << getLine<<endl;
+		cout << getLine << endl;
 		//cout << endl;
 	}
 	cout << "Return to menu - press Enter";
@@ -807,8 +808,8 @@ void workersFeed()
 		{
 			if ((user.workDay[i].startTime != 0 && user.workDay[i].endTime != 0) && (user.workDay[i].startTime != -1 && user.workDay[i].endTime != -1))
 				cout << "\t" << user.workDay[i].day << "/" << user.workDay[i].month << "/" << user.workDay[i].year << "\t" << user.workDay[i].startTime << ":00 - " << user.workDay[i].endTime << ":00" << endl;
-			else if(user.workDay[i].startTime == 0 && user.workDay[i].endTime == 0)
-				cout << "\t" << user.workDay[i].day << "/" << user.workDay[i].month << "/" << user.workDay[i].year << " - Vacation"<< endl;
+			else if (user.workDay[i].startTime == 0 && user.workDay[i].endTime == 0)
+				cout << "\t" << user.workDay[i].day << "/" << user.workDay[i].month << "/" << user.workDay[i].year << " - Vacation" << endl;
 		}
 		inFile.close();
 		cout << "Return to menu - press Enter" << endl;
@@ -855,7 +856,7 @@ void hiringHistory(string currentUser)
 	ifstream inFile;
 	string temp;
 	inFile.open("HiringHistory.txt");
-	while (!inFile.eof()) 
+	while (!inFile.eof())
 	{
 		getline(inFile, temp);
 		if (temp == "UserName:")
@@ -864,13 +865,23 @@ void hiringHistory(string currentUser)
 			if (temp == currentUser)
 			{
 				getline(inFile, temp);
-				getline(inFile, temp);
+				//getline(inFile, temp);
+				inFile >> temp;
 				if (temp != "UserName:")
 				{
 					do
 					{
-						cout << temp<<endl;
-						getline(inFile, temp);
+						cout << temp << "  "; // print
+						printDetails(temp);
+						inFile >> temp;//copy the day name
+						cout << temp << "/";
+						inFile >> temp;//copy the month name
+						cout << temp << "/";
+						inFile >> temp;//copy the year name
+						cout << temp << endl;
+						/*cout << temp << endl;
+						getline(inFile, temp);*/
+						inFile >> temp;
 					} while ((temp != "UserName:") && (!inFile.eof()));
 					inFile.close();
 					cout << "Return to menu - press Enter";
@@ -885,6 +896,57 @@ void hiringHistory(string currentUser)
 	cout << "Return to menu - press Enter";
 	getchar();
 	getchar();
+}
+
+void printDetails(string username)
+{
+	int checkType;
+	string UserName;
+	int userPass, userNumSkills;
+	string userUsername;
+	int userSalary;
+	string userPlace;
+	string *userSkills = NULL;
+	int count = 0;
+	fstream inFile;
+	inFile.open("database.txt");
+	if (inFile.fail()) {
+		cout << "error opening file" << endl;
+		exit(1);
+	}
+	while (!inFile.eof()) {
+		inFile >> userUsername;
+		inFile >> userPass;
+		inFile >> UserName;
+		inFile >> checkType;
+		if (checkType == CONTRACTOR_TYPE)//if the user is contractor 
+		{
+			inFile >> userSalary;
+			inFile >> userNumSkills;
+			userSkills = new string[userNumSkills];
+			if (userSkills == NULL)
+			{
+				cout << "cannot allocate memory" << endl;
+				return;
+			}
+			for (int i = 0; i < userNumSkills; ++i) {
+
+				inFile >> userSkills[i];
+			}
+			inFile >> userPlace;
+			if (username == userUsername)
+			{
+				cout << userSalary << "$  ";
+				for (int i = 0; i < userNumSkills; ++i)
+					cout << userSkills[i] << " ";
+				cout << " ";
+			}
+		}
+
+	}
+	if (userSkills != NULL)
+		delete[] userSkills;
+	inFile.close();
 }
 
 void searchContractor(string currentUser)
@@ -943,10 +1005,10 @@ void searchContractor(string currentUser)
 						if (checkDate(date, userUsername))//check if the contractor is available
 						{
 							++flag;
-							cout <<"Username: " << userUsername << endl<<"Wage: " << userSalary <<endl<<"Skills: "<<endl;
+							cout << "Username: " << userUsername << endl << "Wage: " << userSalary << endl << "Skills: " << endl;
 							for (int i = 0; i < userNumSkills; ++i)
 							{
-								cout <<"\t" <<userSkills[i]<<endl;
+								cout << "\t" << userSkills[i] << endl;
 							}
 							cout << "===================================================================" << endl;
 						}
@@ -1054,14 +1116,14 @@ void bookContractor(string username, string currentUser, WorkDay date)
 	ifstream original("HiringHistory.txt");
 	ofstream replica("HiringHistory2.txt");
 	getline(original, tmp);
-	while (!original.eof() && tmp!=currentUser)
+	while (!original.eof() && tmp != currentUser)
 	{
-		replica << tmp<<endl;
+		replica << tmp << endl;
 		getline(original, tmp);
 	}
 	while (!original.eof() && tmp != "UserName: ")
 	{
-		replica << tmp<<endl;
+		replica << tmp << endl;
 		getline(original, tmp);
 	}
 	replica << datestring << endl;
