@@ -16,6 +16,7 @@ using namespace std;
 const int HR_TYPE = 1;
 const int EMPLOYEER_TYPE = 2;
 const int CONTRACTOR_TYPE = 3;
+const int YEAR = 2020;
 
 int ContractorCount = 0; // Contractor user count.
 int ContractorHired = 0;
@@ -52,13 +53,12 @@ typedef struct Contractor {
 void textColor(int);
 void ourLogo();
 void printBye();
+
 void mainmenu();
 void login();
 void signUp();
 void writeUserToFile(User);
-
 void ChooseMenu(int, string);
-
 void tech();
 
 void contractorMenu(string);
@@ -80,7 +80,7 @@ void printAllContractorNames();
 void employeerMenu(string);
 void hiringHistory(string);
 void searchContractor(string);
-void bookContractor(string, string, WorkDay);
+void bookContractor(string, WorkDay);//string, string, WorkDay);
 void printDetails(string);
 
 
@@ -235,7 +235,11 @@ void signUp() // only Employer can signup
 	cin >> username;
 	cout << "password: " << endl;
 	cin >> password;
-
+	while (password.length() < 6)
+	{
+		cout << "The password is too short, please try again:" << endl;
+		cin >> password;
+	}
 	lowercase(username); //Account usernames will be stored in lowercase on the DataBase.
 
 	// Username in database must be unique.
@@ -249,6 +253,7 @@ void signUp() // only Employer can signup
 	{
 		cout << "Username taken." << endl << "Enter another username: ";
 		cin >> username;
+		lowercase(username);
 	}
 	u1.fullName = name;
 	u1.username = username;
@@ -608,12 +613,23 @@ void editprofile(Contractor& worker)
 		case 1:
 			cout << "Enter new wage: ";
 			cin >> worker.salary;
+			while (worker.salary < 0)
+			{
+				cout << "The wage must be positive integer- please try again" << endl;
+				cin >> worker.salary;
+			}
 			break;
 		case 2:
-			cout << "Enter new location: ";
+			cout << "Enter new location: - north/ south / center ";
 			cin.ignore();
 			getline(cin, worker.place);
-			worker.place = " " + worker.place;
+			//worker.place = " " + worker.place;
+			while (worker.place != "north" && worker.place != "center" && worker.place != "south")
+			{
+				cout << "The location is incorrect, try again" << endl << "Enter location - north/center/south ( 0 if not needed)" << endl;
+				getline(cin, worker.place);
+			}
+
 			break;
 		case 3:
 			temp = new string[worker.numskills + 1];
@@ -629,7 +645,7 @@ void editprofile(Contractor& worker)
 			inFile << worker.details.username << " " << worker.details.password << " " << worker.details.fullName << " " << CONTRACTOR_TYPE << " " << worker.salary << " " << worker.numskills;
 			for (int i = 0; i < worker.numskills; ++i)
 				inFile << " " << worker.skill[i];
-			inFile << worker.place << endl;
+			inFile << " " << worker.place << endl;
 			break;
 		default:
 			cout << "Incorrect input" << endl;
@@ -700,6 +716,13 @@ void statisticAnalysis()
 void monitorHiring()
 {
 	ourLogo();
+	if (!ContractorHired)
+	{
+		cout << "There is no hiring in the compny - press enter to get back to the menu" << endl;
+		getchar();
+		while (getchar() != '\n');
+		return;
+	}
 	fstream inFile;
 	inFile.open("HiringHistory.txt");
 	if (inFile.fail()) {
@@ -732,17 +755,29 @@ void addNewWorker()
 	cout << "Hello, welcome to add a new worker " << endl;
 	cout << "Enter username: ";
 	cin >> username;
+	lowercase(username);
 	while (checkUserExists(checkDatabase, username))
 	{
 		cout << "Username already taken, enter another: ";
 		cin >> username;
+		lowercase(username);
 	}
 	cout << "Enter password: ";
 	cin >> pass;
+	while (pass.length() < 6)
+	{
+		cout << "The password is too short, please try again:" << endl;
+		cin >> pass;
+	}
 	cout << "Enter name: ";
 	cin >> fullName;
 	cout << "Enter wage: ";
 	cin >> wage;
+	while (wage < 0)
+	{
+		cout << "The wage must be a positive integer - please enter again:" << endl;
+		cin >> wage;
+	}
 	cout << "Enter how much skills contractor has: ";
 	cin >> numberSkills;
 	string* skills = new string[numberSkills];
@@ -759,6 +794,11 @@ void addNewWorker()
 	cout << "Enter area: ";
 	cin.ignore();
 	getline(cin, place);
+	while (place != "north" && place != "center" && place != "south" && place != "0")
+	{
+		cout << "The area is incorrect, try again" << endl << "Enter area - north/center/south ( 0 if not needed)" << endl;
+		getline(cin, place);
+	}
 	checkDatabase.close();
 	ofstream inFile;
 	inFile.open("database.txt", ios::app);
@@ -796,6 +836,13 @@ void addNewWorker()
 
 void workersFeed()
 {
+	if (!ContractorCount)
+	{
+		cout << "There are no contractor registered in the company yet ! - to return press enter" << endl;
+		getchar();
+		while (getchar() != '\n');
+		return;
+	}
 	ourLogo();
 	printAllContractorNames();
 	ifstream inFile;
@@ -844,6 +891,7 @@ void workersFeed()
 	else cout << "User does not exist. Return to menu - press Enter" << endl;
 	getchar();
 	inFile.close();
+
 }
 
 void employeerMenu(string userInput)
@@ -879,6 +927,7 @@ void employeerMenu(string userInput)
 void hiringHistory(string currentUser)
 {
 	ourLogo();
+	int flag = 0;
 	ifstream inFile;
 	string temp;
 	inFile.open("HiringHistory.txt");
@@ -893,28 +942,28 @@ void hiringHistory(string currentUser)
 				getline(inFile, temp);
 				//getline(inFile, temp);
 				inFile >> temp;
-				if (temp != "UserName:")
+				while ((temp != "UserName:") && (!inFile.eof()))
 				{
-					do
-					{
-						cout << temp << "  "; // print
-						printDetails(temp);
-						inFile >> temp;//copy the day name
-						cout << temp << "/";
-						inFile >> temp;//copy the month name
-						cout << temp << "/";
-						inFile >> temp;//copy the year name
-						cout << temp << endl;
-						/*cout << temp << endl;
-						getline(inFile, temp);*/
-						inFile >> temp;
-					} while ((temp != "UserName:") && (!inFile.eof()));
-					inFile.close();
-					cout << "Return to menu - press Enter";
-					getchar();
-					getchar();
-					return;
+					++flag;
+					cout << temp << "  "; // print
+					printDetails(temp);
+					inFile >> temp;//copy the day name
+					cout << temp << "/";
+					inFile >> temp;//copy the month name
+					cout << temp << "/";
+					inFile >> temp;//copy the year name
+					cout << temp << endl;
+					/*cout << temp << endl;
+					getline(inFile, temp);*/
+					inFile >> temp;
 				}
+				if (flag == 0)
+					cout << "There is no hiring yet!" << endl;
+				inFile.close();
+				cout << "Return to menu - press Enter";
+				getchar();
+				getchar();
+				return;
 			}
 		}
 	}
@@ -930,29 +979,45 @@ void searchContractor(string currentUser)
 	string location, skill, temp;
 	int minWage, maxWage;
 	WorkDay date;
-	cout << "Enter location ( 0 if not needed)" << endl;
+	cout << "Enter location - north/center/south ( 0 if not needed)" << endl;
 	cin.ignore();
 	getline(cin, location);
-	location = " " + location;
+	while (location != "north" && location != "center" && location != "south" && location != "0")
+	{
+		cout << "The location is incorrect, try again" << endl << "Enter location - north/center/south ( 0 if not needed)" << endl;
+		getline(cin, location);
+	}
 	cout << "Enter Skill ( 0 if not needed)" << endl;
 	cin >> skill;
 	cout << "Enter minimum wage ( 0 if not needed)" << endl;
 	cin >> minWage;
+	while (minWage < 0)
+	{
+		cout << "The wage must be positive integer- please try again" << endl;
+		cin >> minWage;
+	}
 	cout << "Enter maxWage ( 0 if not needed)" << endl;
 	cin >> maxWage;
-	cout << "Enter date ( 0 if not needed)" << endl;
+	while (maxWage < 0)
+	{
+		cout << "The wage must be positive integer- please try again" << endl;
+		cin >> maxWage;
+	}
+	cout << "Enter date " << endl;
 	date = calendar(currentUser);
-	fstream inFile;
+	ifstream inFile;
 	inFile.open("database.txt");
 	if (inFile.fail()) {
+
 		cout << "error opening file" << endl;
 		exit(1);
 	}
 	int checkType, userNumSkills, userSalary, flag = 0;
 	string UserName, userPass, userUsername, userPlace;
 	cout << "searching workers for: " << skill << "\t" << date.day << "/" << date.month << "/" << date.year << endl;
+	getline(inFile, temp);
+	inFile >> userUsername;
 	while (!inFile.eof()) {
-		inFile >> userUsername;
 		inFile >> userPass;
 		inFile >> UserName;
 		inFile >> checkType;
@@ -971,7 +1036,7 @@ void searchContractor(string currentUser)
 				inFile >> userSkills[i];
 			}
 			getline(inFile, userPlace);
-			if (userPlace == location || location == " 0")
+			if (userPlace == location || location == "0")
 			{
 				if (checkSkills(userSkills, userNumSkills, skill) || skill == "0")
 				{
@@ -992,6 +1057,8 @@ void searchContractor(string currentUser)
 			}
 			delete[] userSkills;
 		}
+		inFile >> userUsername;
+
 	}
 	if (flag == 0)
 	{
@@ -1001,15 +1068,28 @@ void searchContractor(string currentUser)
 		getchar();
 		return;
 	}
+
 	getchar();
-	cout << "Please enter the name of the contractor you want to book" << endl;
-	cin >> UserName;
-	bookContractor(UserName, currentUser, date); // contrator, employer , date
+	bookContractor(currentUser, date);
 	inFile.close();
 }
 
-void bookContractor(string username, string currentUser, WorkDay date)
+void bookContractor(string currentUser, WorkDay date)
 {
+	string username;
+	cout << "Please enter the name of the contractor you want to book" << endl;
+	cin >> username;
+	ifstream inFile;
+	inFile.open("database.txt");
+	if (inFile.fail()) {
+		cout << "error opening file" << endl;
+		exit(1);
+	}
+	if (!checkUserExists(inFile, username))
+	{
+		cout << "this user is not exist, please enter correct name:";
+		cin >> username;
+	}
 	Contractor worker;
 	buildContractor(worker, username);
 	worker.numOfWorkDays++;
@@ -1064,6 +1144,7 @@ void bookContractor(string username, string currentUser, WorkDay date)
 	remove("HiringHistory.txt");
 	rename("HiringHistory2.txt", "HiringHistory.txt");
 	++ContractorHired;//increas the number of contractor that hired
+	inFile.close();
 }
 
 void printDetails(string username)
@@ -1081,6 +1162,7 @@ void printDetails(string username)
 		cout << "error opening file" << endl;
 		exit(1);
 	}
+	getline(inFile, UserName);
 	while (!inFile.eof()) {
 		inFile >> userUsername;
 		inFile >> userPass;
@@ -1118,6 +1200,7 @@ void printDetails(string username)
 
 void printAllContractorNames()
 {
+
 	int checkType;
 	string userUsername;
 	string temp;
@@ -1142,6 +1225,7 @@ void printAllContractorNames()
 		inFile >> userUsername;
 	}
 	inFile.close();
+
 }
 
 void lowercase(string& data)
@@ -1257,6 +1341,10 @@ WorkDay calendar(string currentUser) {
 	} while (1);
 	cout << "enter year: ";
 	cin >> year;
+	while (year < YEAR) {
+		cout << "The year is not coorect, please enter new one:" << endl;
+		cin >> year;
+	}
 	WorkDay temp;
 	temp.day = day;
 	temp.month = month;
