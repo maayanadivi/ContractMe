@@ -976,6 +976,13 @@ void hiringHistory(string currentUser)
 void searchContractor(string currentUser)
 {
 	ourLogo();
+	if (!ContractorCount)
+	{
+		cout << "There is no contractor  in the compny - press enter to get back to the menu" << endl;
+		getchar();
+		while (getchar() != '\n');
+		return;
+	}
 	string location, skill, temp;
 	int minWage, maxWage;
 	WorkDay date;
