@@ -426,8 +426,18 @@ void addworkday(Contractor& worker)
 	WorkDay date = calendar(worker.details.username);
 	cout << "Enter work start hour " << endl;
 	cin >> date.startTime;
+	while (date.startTime < 0 && date.startTime >23)
+	{
+		cout << "The hour is not valid-try again" << endl;
+		cin >> date.startTime;
+	}
 	cout << "Enter work end hour " << endl;
 	cin >> date.endTime;
+	while (date.endTime < 0 && date.endTime >23)
+	{
+		cout << "The hour is not valid-try again" << endl;
+		cin >> date.endTime;
+	}
 	for (int i = 0; i < worker.numOfWorkDays; ++i)
 	{
 		if (date.day == worker.workDay[i].day)
