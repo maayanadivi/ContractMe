@@ -575,8 +575,6 @@ void updateWorkHistory(Contractor& worker)
 	remove("workHistory.txt");
 	rename("workHistory2.txt", "workHistory.txt");
 	getchar();
-	cout<< "Press enter to return" << endl;
-	while (getchar() != '\n');
 }
 
 void editprofile(Contractor& worker)
@@ -1293,7 +1291,7 @@ bool checkDate(WorkDay date, string userName)
 	WorkDay temp; //temp date
 	fstream inFile;
 	inFile.open("workHistory.txt");
-	if (inFile.fail()) 
+	if (inFile.fail())
 	{
 		cout << "error opening file" << endl;
 		exit(1);
