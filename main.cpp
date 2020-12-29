@@ -575,6 +575,8 @@ void updateWorkHistory(Contractor& worker)
 	remove("workHistory.txt");
 	rename("workHistory2.txt", "workHistory.txt");
 	getchar();
+	cout << "Press enter to return" << endl;
+	while (getchar() != '\n');
 }
 
 void editprofile(Contractor& worker)
@@ -894,6 +896,9 @@ void workersFeed()
 				<< "\t $" << user.workDay[i].wage << " for hour" << endl;
 			else if (user.workDay[i].startTime == 0 && user.workDay[i].endTime == 0)
 				cout << "\t" << user.workDay[i].day << "/" << user.workDay[i].month << "/" << user.workDay[i].year << " - Vacation" << endl;
+			else if (user.workDay[i].startTime == -1 && user.workDay[i].endTime == -1)
+				cout << "\t" << user.workDay[i].day << "/" << user.workDay[i].month << "/" << user.workDay[i].year << " - Warning! Not reported day!" << endl;
+
 		}
 		inFile.close();
 		cout << "If you want to edit a workday  - press 1" << endl << "If you want to exit  - press 0" << endl;;
@@ -906,7 +911,6 @@ void workersFeed()
 			return;
 	}
 	else cout << "User does not exist. Return to menu - press Enter" << endl;
-	getchar();
 	inFile.close();
 
 }
