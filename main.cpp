@@ -896,8 +896,7 @@ void workersFeed()
 				<< "\t $" << user.workDay[i].wage << " for hour" << endl;
 			else if (user.workDay[i].startTime == 0 && user.workDay[i].endTime == 0)
 				cout << "\t" << user.workDay[i].day << "/" << user.workDay[i].month << "/" << user.workDay[i].year << " - Vacation" << endl;
-			else if (user.workDay[i].startTime == -1 && user.workDay[i].endTime == -1)
-				cout << "\t" << user.workDay[i].day << "/" << user.workDay[i].month << "/" << user.workDay[i].year << " - Warning! Not reported day!" << endl;
+			else cout << "\t" << user.workDay[i].day << "/" << user.workDay[i].month << "/" << user.workDay[i].year << " - Warning! Not reported day!" << endl;
 
 		}
 		inFile.close();
