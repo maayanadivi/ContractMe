@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <windows.h> 
@@ -469,6 +469,7 @@ void addworkday(Contractor& worker)
 	}
 	delete[] worker.workDay;
 	worker.workDay = temp;
+	cout << "Work Day added successfully." << endl;
 	updateWorkHistory(worker);
 }
 
@@ -522,6 +523,7 @@ void addvacation(Contractor& worker)
 		worker.workDay = temp;
 		startVacation.day++;
 	}
+	cout << "Vacation Day added successfully, Enjoy!" << endl;
 	updateWorkHistory(worker);
 }
 
@@ -572,6 +574,9 @@ void updateWorkHistory(Contractor& worker)
 	replica.close();
 	remove("workHistory.txt");
 	rename("workHistory2.txt", "workHistory.txt");
+	getchar();
+	cout<< "Press enter to return" << endl;
+	while (getchar() != '\n');
 }
 
 void editprofile(Contractor& worker)
@@ -656,12 +661,16 @@ void editprofile(Contractor& worker)
 			for (int i = 0; i < worker.numskills; ++i)
 				inFile << " " << worker.skill[i];
 			inFile << " " << worker.place << endl;
+			cout << "New details Saved successfully." << endl;
 			break;
 		default:
 			cout << "Incorrect input" << endl;
 			break;
 		}
 	}
+	getchar();
+	cout << "Press enter to return" << endl;
+	while (getchar() != '\n');
 	inFile.close();
 }
 
@@ -1280,11 +1289,12 @@ bool checkUserExists(ifstream& inFile, string userName)
 
 bool checkDate(WorkDay date, string userName)
 {
-	string tempUser;
+	string tempUser, tempWage;
 	WorkDay temp; //temp date
 	fstream inFile;
 	inFile.open("workHistory.txt");
-	if (inFile.fail()) {
+	if (inFile.fail()) 
+	{
 		cout << "error opening file" << endl;
 		exit(1);
 	}
@@ -1309,7 +1319,7 @@ bool checkDate(WorkDay date, string userName)
 							inFile.close();
 							return false;
 						}
-
+				inFile >> tempWage;
 			}
 
 		}
