@@ -804,7 +804,7 @@ void addNewWorker()
 	cout << "Enter area: ";
 	cin.ignore();
 	getline(cin, place);
-	while (place != "north" && place != "center" && place != "south" && place != "0")
+	while (place != "north" && place != "center" && place != "south")
 	{
 		cout << "The area is incorrect, try again" << endl << "Enter area - north/center/south ( 0 if not needed)" << endl;
 		getline(cin, place);
