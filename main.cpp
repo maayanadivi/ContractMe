@@ -1075,9 +1075,11 @@ void searchContractor(string currentUser)
 		getchar();
 		return;
 	}
-
 	getchar();
-	bookContractor(currentUser, date);
+	cout << "if you want to continue with the hiring press - 0, if you want to stop the hiring and go back to the menu press any other number" << endl;
+	cin >> flag;
+	if (flag == 0)
+		bookContractor(currentUser, date);
 	inFile.close();
 }
 
@@ -1152,6 +1154,10 @@ void bookContractor(string currentUser, WorkDay date)
 	rename("HiringHistory2.txt", "HiringHistory.txt");
 	++ContractorHired;//increas the number of contractor that hired
 	inFile.close();
+	cout << "The hiring succeeded- press enter to continue " << endl;
+	getchar();
+	while (getchar() != '\n');
+
 }
 
 void printDetails(string username)
