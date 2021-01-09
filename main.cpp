@@ -304,8 +304,10 @@ void tech()
 	string problem;
 	cout << "\nHello, welcome to tech support.\n please describe your problem: " << endl;
 	cin >> problem;
+	cin.ignore(80, '\n');
 	cout << "\nThank you for your message, we will return to you with a solution asap " << endl;
-
+	cout << "\n**********************************************************************\n\n" << endl;
+	return;
 }
 
 void contractorMenu(string userInput)
@@ -1062,12 +1064,13 @@ void searchContractor(string currentUser)
 
 				inFile >> userSkills[i];
 			}
-			getline(inFile, userPlace);
+			//getline(inFile, userPlace);
+			inFile >> userPlace;
 			if (userPlace == location || location == "0")
 			{
 				if (checkSkills(userSkills, userNumSkills, skill) || skill == "0")
 				{
-					if ((userSalary > minWage && userSalary < maxWage) || (minWage < userSalary && maxWage == 0))
+					if ((userSalary >= minWage && userSalary <= maxWage) || (minWage <= userSalary && maxWage == 0)) // here
 					{
 						if (checkDate(date, userUsername))//check if the contractor is available
 						{
