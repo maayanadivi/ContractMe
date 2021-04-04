@@ -304,10 +304,8 @@ void tech()
 	string problem;
 	cout << "\nHello, welcome to tech support.\n please describe your problem: " << endl;
 	cin >> problem;
-	cin.ignore(80, '\n');
 	cout << "\nThank you for your message, we will return to you with a solution asap " << endl;
-	cout << "\n**********************************************************************\n\n" << endl;
-	return;
+
 }
 
 void contractorMenu(string userInput)
@@ -577,8 +575,6 @@ void updateWorkHistory(Contractor& worker)
 	remove("workHistory.txt");
 	rename("workHistory2.txt", "workHistory.txt");
 	getchar();
-	cout << "Press enter to return" << endl;
-	while (getchar() != '\n');
 }
 
 void editprofile(Contractor& worker)
@@ -898,8 +894,6 @@ void workersFeed()
 				<< "\t $" << user.workDay[i].wage << " for hour" << endl;
 			else if (user.workDay[i].startTime == 0 && user.workDay[i].endTime == 0)
 				cout << "\t" << user.workDay[i].day << "/" << user.workDay[i].month << "/" << user.workDay[i].year << " - Vacation" << endl;
-			else cout << "\t" << user.workDay[i].day << "/" << user.workDay[i].month << "/" << user.workDay[i].year << " - Warning! Not reported day!" << endl;
-
 		}
 		inFile.close();
 		cout << "If you want to edit a workday  - press 1" << endl << "If you want to exit  - press 0" << endl;;
@@ -912,6 +906,7 @@ void workersFeed()
 			return;
 	}
 	else cout << "User does not exist. Return to menu - press Enter" << endl;
+	getchar();
 	inFile.close();
 
 }
@@ -1064,13 +1059,12 @@ void searchContractor(string currentUser)
 
 				inFile >> userSkills[i];
 			}
-			//getline(inFile, userPlace);
-			inFile >> userPlace;
+			getline(inFile, userPlace);
 			if (userPlace == location || location == "0")
 			{
 				if (checkSkills(userSkills, userNumSkills, skill) || skill == "0")
 				{
-					if ((userSalary >= minWage && userSalary <= maxWage) || (minWage <= userSalary && maxWage == 0)) // here
+					if ((userSalary > minWage && userSalary < maxWage) || (minWage < userSalary && maxWage == 0))
 					{
 						if (checkDate(date, userUsername))//check if the contractor is available
 						{
